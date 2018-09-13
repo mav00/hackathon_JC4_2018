@@ -38,8 +38,10 @@ end
 
 function Example:advance(me, enemy)
 	local result = {}
+	calc_hitbox(me,enemy)
 	calc_Inputs(me,enemy)
-	result = doStrategie(me,enemy)
+	doStrategie(me,enemy)
+	result = doAction(me)
 
 
 	--if me["attacking"] == true then

@@ -38,7 +38,7 @@ end
 
 
 function Example:advance(me, enemy)
-	math.randomseed(os.time())
+	-- math.randomseed(os.time())
 	x= math.random();
 	if math.mod(x,2) == 0 then 
 		return self:lowblock(me)

@@ -14,9 +14,9 @@ function Example.new(player)
    setmetatable(self, Example_mt)
 
    self.i = 0 
-   self.m_playerAction = _playerAction.new()
-   self.m_playerStrategy = _playerStrategie.new(self.m_playerAction)
-   self.m_playerInputs = _playerinputs.new() 
+   self.m_playerAction = _playerAction.new(false)
+   self.m_playerStrategy = _playerStrategie.new(self.m_playerAction,false)
+   self.m_playerInputs = _playerinputs.new(false) 
    
 
    return self
@@ -91,7 +91,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "space Worf"
+	return "Space Worf "
 end
 
 

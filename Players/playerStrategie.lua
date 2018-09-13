@@ -1,3 +1,19 @@
+local playerStrategie = {}
+
+playerStrategie.__index = playerStrategie -- failed table lookups on the instances should fallback to the class table, to get methods
+setmetatable(playerStrategie, {
+  __call = function (cls, ...)
+    return cls.new(...)
+  end,
+})
+
+function playerStrategie.new(init)
+   local t = setmetatable({}, { __index = playerStrategie })
+
+   -- Your constructor stuff
+   t.value = init
+  return t
+end
 
 --eingabe m_Fluchtplatz 0..500
 --eingabe m_magicGefahr bool
@@ -15,7 +31,11 @@
 
 --schreibt m_actionQueue
 
-function doStrategie(me,enemy)
+function playerStrategie:getValue()
+  return self.value
+end
+
+function playerStrategie:doStrategie(me,enemy)
 
 -- Wieviel Zeit hab ich
 -- Angriff vs Verteidigung vs Flucht?
@@ -25,3 +45,5 @@ function doStrategie(me,enemy)
 
 
 end
+
+return playerStrategie

@@ -1,4 +1,5 @@
 require("Player")
+local _playerStrategie = require("playerStrategie")
 
 local Example = {}
 setmetatable(Example, {__index = Player})
@@ -9,7 +10,8 @@ function Example.new(player)
    setmetatable(self, Example_mt)
 
    self.i = 0 
-
+  self.ps = _playerStrategie.new(42)
+  self.ps:getValue()
    return self
 end
 
@@ -76,7 +78,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "Example2"
+	return "DathVader"
 end
 
 function Example:moveBackward(me)

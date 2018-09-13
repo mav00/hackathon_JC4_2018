@@ -1,7 +1,7 @@
 require("Match")
 require("Config")
 
-
+package.path = package.path..";../Players/?.lua"
 
 console.writeline("--- COMBAT BEGIN ---")
 

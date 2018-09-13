@@ -51,12 +51,12 @@ function Example:advance(me, enemy)
 	--calc_hitbox(me,enemy)
 	x = enemy["fighter"]
 	self.m_playerInputs:calc_Inputs(me,enemy)
-	self.m_playerStrategy:doStrategie(me,enemy, m_playerInputs)
+	self.m_playerStrategy:doStrategie(me,enemy, self.m_playerInputs)
 
 
 	
 
-	result = self.m_playerAction:airPunch(me)
+	
 
 	--if me["attacking"] == true then
 	
@@ -79,10 +79,10 @@ function Example:fighter()
 	-- return "Balrog"
 	-- return "Ken"
 	-- return "ChunLi"
-	return "Zangief"
+	-- return "Zangief"
 	-- return "Dhalsim"
 	-- return "Sagat"
-	-- return "Vega"
+	return "Vega"
 	-- return "THawk"
 	-- return "Feilong"
 	-- return "DeeJay"

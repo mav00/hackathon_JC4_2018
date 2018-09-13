@@ -123,6 +123,9 @@ function playerAction:backward(me)
   return "Right"
 end
 
+function playerAction:isInAction()
+return self.i == 0
+
 
 return playerAction
 

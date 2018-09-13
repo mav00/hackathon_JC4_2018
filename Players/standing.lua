@@ -43,6 +43,7 @@ function Example:advance(me, enemy)
 	if math.mod(x,2) == 0 then 
 		return self:lowblock(me)
 	end
+  return {}
 end
 
 function Example:fighter()
@@ -65,7 +66,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "Example2"
+	return "Stand"
 end
 
 function Example:moveBackward(me)

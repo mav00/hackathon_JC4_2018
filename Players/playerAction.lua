@@ -1,12 +1,7 @@
 require("Player")
 
-<<<<<<< HEAD
 local playerAction = {}
 local playerAction_mt = {__index = playerAction}
-=======
---liest m_actionQueue
-function doAction(me)
->>>>>>> cf217dcf8c7a38aa1651470975ea22c9b9615dd6
 
 function playerAction.new(player)
    local self = Player.new(player)
@@ -65,6 +60,7 @@ function playerAction:lowPunch(intensity)
       result[highIntPunch] = true
     end
     result["Down"] = true
+    return result
 end
     
 function playerAction:airPunch(me)
@@ -98,6 +94,7 @@ function playerAction:lowKick(intensity)
       result[highIntKick] = true
     end
     result["Down"] = true
+    return result
 end
 
 

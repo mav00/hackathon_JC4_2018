@@ -84,6 +84,43 @@ function playerAction:airPunch(me)
    return result
 end
 
+-- medium intensity rainbow
+function playerAction:rainbowM(me)
+   local result = {}
+   if self.i < 3 then  -- back
+      result[self:backward(me)] = true
+   elseif self.i > 3 and self.i < 10
+   then -- back + punch
+      result[self:backward(me)] = true
+      result[self:mediumIntPunch()] = true
+   elseif self.i >10
+   then
+      self.i = 0
+   end
+
+   self.i = self.i + 1
+   return result
+end
+
+-- high intensity rainbow
+function playerAction:rainbowH(me)
+   local result = {}
+   if self.i < 3 then  -- back
+      result[self:backward(me)] = true
+   elseif self.i > 3 and self.i < 10
+   then -- back + punch
+      result[self:backward(me)] = true
+      result[self:highIntPunch()] = true
+   elseif self.i >10
+   then
+      self.i = 0
+   end
+
+   self.i = self.i + 1
+   return result
+end
+
+
 
 --[[ KICKS ]]-- 
 function lowIntKick() return "A" end

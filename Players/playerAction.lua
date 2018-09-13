@@ -28,7 +28,7 @@ end
 -- go backwards
 function playerAction:goBackward(me)
   local result = {}
-  result[backward(me)] = true
+  result[self:backward(me)] = true
   return result
 end
 
@@ -102,6 +102,28 @@ function playerAction:rainbowM(me)
    return result
 end
 
+-- medium intensity stardust drop
+function playerAction:stardustDropM(me)
+   local result = {}
+   if self.i < 3 then 
+      result[self:forward(me)] = true
+      result["Up"]=true
+   end
+   if self.i < 6 then  -- back
+      result[self:forward(me)] = true
+   elseif self.i > 6 and self.i < 13
+   then -- back + punch
+      result[self:backward(me)] = true
+      result[self:mediumIntPunch()] = true
+   elseif self.i > 13
+   then
+      self.i = 0
+   end
+
+   self.i = self.i + 1
+   return result
+end
+
 -- high intensity rainbow
 function playerAction:rainbowH(me)
    local result = {}
@@ -120,6 +142,27 @@ function playerAction:rainbowH(me)
    return result
 end
 
+-- high intensity stardust drop
+function playerAction:stardustDropH(me)
+   local result = {}
+   if self.i < 3 then 
+      result[self:forward(me)] = true
+      result["Up"]=true
+   end
+   if self.i < 6 then  -- back
+      result[self:forward(me)] = true
+   elseif self.i > 6 and self.i < 13
+   then -- back + punch
+      result[self:backward(me)] = true
+      result[self:highIntPunch()] = true
+   elseif self.i > 13
+   then
+      self.i = 0
+   end
+
+   self.i = self.i + 1
+   return result
+end
 
 
 --[[ KICKS ]]-- 
@@ -144,8 +187,6 @@ function playerAction:lowKick(intensity)
 end
 
 
--- local functions
-
 function playerAction:forward(me)
   if me["facingRight"] then
     return "Right"
@@ -165,4 +206,3 @@ function playerAction:isInAction()
 end
 
 return playerAction
-

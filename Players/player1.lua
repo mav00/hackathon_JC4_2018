@@ -14,10 +14,10 @@ function Example.new(player)
    setmetatable(self, Example_mt)
 
    self.i = 0 
-
-   self.m_playerStrategy = _playerStrategie.new(42)
-   self.m_playerInputs = _playerinputs.new() 
    self.m_playerAction = _playerAction.new()
+   self.m_playerStrategy = _playerStrategie.new(self.m_playerAction)
+   self.m_playerInputs = _playerinputs.new() 
+   
 
    return self
 end

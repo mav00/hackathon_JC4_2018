@@ -61,7 +61,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "Example2"
+	return "Stand"
 end
 
 function Example:moveBackward(me)

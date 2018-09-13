@@ -51,23 +51,7 @@ function Example:advance(me, enemy)
 	--calc_hitbox(me,enemy)
 	x = enemy["fighter"]
 	self.m_playerInputs:calc_Inputs(me,enemy)
-	self.m_playerStrategy:doStrategie(me,enemy, self.m_playerInputs)
-
-
-	--result =  self.m_playerAction:rainbowM(me)
-
-
-	
-
-	--if me["attacking"] == true then
-	
-
-	
-		--if enemy["attaking"] then 
-		--	if enemy["magic"] and enemy["remoteAttack"] then
-		
-
-	
+	result = self.m_playerStrategy:doStrategie(me,enemy, self.m_playerInputs)
 	return result
 
 end

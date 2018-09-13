@@ -14,32 +14,16 @@ function playerStrategie.new(action, debugFlag)
    t.action = action
    t.debug = debugFlag
    t.isStrategyOffensive = true
-   t.lastActionString = "init"
+   t.lastAction = oInit
   return t
 end
 
---eingabe m_Fluchtplatz 0..500
---eingabe m_magicBullet bool
---eingabe m_magicBulletDistance 0..200
---eingabe m_GegnerStats_Speed {fast, med, slow}
---eingabe m_Gegner_CanBeHitByUs
---eingabe m_Gegner_CanHitUs
---eingabe m_ActivityEnemy
-            -- spam
-            -- block
-            -- nichts
-            -- jumper
-            -- switcher
-            -- ....
 
---schreibt m_actionQueue
-
+oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dPunchMid, dPunchHigh, dCrouchKickHigh, dAirKickHigh,
+punchLow, punchMid, punchHigh, airKickHigh, rainbowMid =
+"o init", "d crouch block", "d block", "d kick low", "d punch low", "d punch mid", "d punch high", "d crouch kick high", "d air kick high",
+"punch low", "punch mid", "punch high", "air kick high", "rainbow mid"
 -------------------------------------------------------
--- Wieviel Zeit hab ich
--- Angriff vs Verteidigung vs Flucht?
--- AngriffsArt/Verteidungsart/Fluchtart
--- IdealAbstand (zB Sicherheitsabstand oder Angriffsabstand)
--- ActionQueue updaten (add/clear/..)
 function playerStrategie:doStrategie(me, enemy, input)
   self.me = me
   self.enemy = enemy
@@ -49,55 +33,91 @@ function playerStrategie:doStrategie(me, enemy, input)
   local enCrouching = (enemy["crounching"] == true)
   local magicBulletDanger = input.m_magicBullet
   local shouldApproach = input.m_Gegner_CanBeHitByUs
-  local attackDistanceHigh = 90
-  local attackDistanceMid = 74
-  local attackDistanceLow = 80
-  local blockDistance = 60
-  local distToEnemy = me["distanceToOpponent"]
-  local actionOngoing = false
+  local attackDistanceSlide = 118
+  local attackDistancePHigh = 99
+  local attackDistancePMid = 93
+  local attackDistancePLow = 58
+  local attackDistanceKHigh = 63
+  local attackDistanceKMid = 74
+  local attackDistanceKLow = 54
+  local attackDistanceThrow = 25
+  local blockDistance = 80
+  local distToEnemy = input.m_Gegner_DistanceNose2Nose
+  local actionOngoing = self.action:isInAction()
  
   if actionOngoing then
-    self:drawText(self.lastActionString)
-    return
+    self:drawText(self.lastAction .. "~")
+    return self:getActionResult(self.lastAction)
   end
   
-  local r = "nix"
+  local r = oInit
  
   if enAttacking and magicBulletDanger then
-    self:actionDefendMagic()
     r = "defend magic"
+    --a = self:actionDefendMagic()
   elseif enAttacking then
-    if enCrouching and (distToEnemy < attackDistanceHigh) then
-      r = "d crouch block"
-    elseif (distToEnemy < blockDistance) then
-      r = "d block"
-    elseif (distToEnemy < attackDistanceLow) then
-      r = "d punch light"
-    elseif (distToEnemy < attackDistanceMid) then
-      r = "d punch mid"
-    elseif (distToEnemy < attackDistanceHigh) then
-      r = "d block"
+    if enCrouching and input.m_Gegner_CanHitUs then
+      r = dAirKickHigh
+    elseif input.m_Gegner_CanHitUs then
+      r = dCrouchBlock
+    elseif (distToEnemy < attackDistanceSlide) then
+      r = dCrouchKickHigh -- slide
     else
-      r = "air kick high"
+      -- chill
     end
   else -- enemy not attacking
-    if (distToEnemy < blockDistance) then
-      r = "throw"
-    elseif (distToEnemy < attackDistanceLow) then
-      r = "punch light"
-    elseif (distToEnemy < attackDistanceMid) then
+    if (distToEnemy < attackDistanceThrow) then
+      r = rainbowMid
+    elseif (distToEnemy < attackDistancePLow) then
+      r = punchLow
+    elseif (distToEnemy < attackDistancePMid) then
       if enCrouching then
-        r = "air kick high"
+        r = airKickHigh
       else
-        r = "punch mid"
+        r = punchMid
       end
     else
       r = "rolling crystal flash"
+      
     end
   end
   
-  self.lastActionString = r .. " " .. distToEnemy
-  self:drawText(self.lastActionString)
+  self.lastAction = r
+  self:drawText(self.lastAction)
+  return self:getActionResult(self.lastAction)
+end
+
+function playerStrategie:getActionResult(a)
+  r = {}
+  if dCrouchBlock == a then
+    r = self.action:goBackward(self.me)
+    r["Down"] = true
+  elseif dBlock == a then
+    r = self.action:goBackward(self.me)
+  elseif dKickLow == a then
+    r = self.action:lowIntKick()
+  elseif dPunchLow == a then
+    r = self.action:lowIntPunch()
+  elseif dPunchMid == a then
+    r = self.action:mediumIntPunch()
+  elseif dPunchHigh == a then
+    r = self.action:highIntPunch()
+  elseif dCrouchKickHigh == a then
+    r = self.action:lowKick("H")
+  elseif dAirKickHigh == a then
+    r = self.action:airKick(self.me)
+  elseif punchLow == a then
+    r = self.action:lowIntPunch()
+  elseif punchMid == a then
+    r = self.action:mediumIntPunch()
+  elseif punchHigh == a then
+    r = self.action:highIntPunch()
+  elseif airKickHigh == a then
+    r = self.action:airKick(self.me)
+  elseif rainbowMid == a then
+    r = self.action:rainbowM(self.me)
+  end
+  return r
 end
 
 function playerStrategie:actionDefendMagic()
@@ -114,7 +134,7 @@ end
 
 function playerStrategie:drawText(text)
   if self.debug then
-    Draw.DrawAtBottom(text)
+    Draw.DrawAtBottom(text .. " " .. self.input.m_Gegner_DistanceNose2Nose)
   end
 end
 

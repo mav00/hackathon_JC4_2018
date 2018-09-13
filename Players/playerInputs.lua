@@ -47,10 +47,12 @@ fast, med, slow = 0, 1, 2
 sleeper, blocker, spammer, jumper, switcher = 0,1,2,3,4
 
 KEnemyName_Vega = "Vega"
+KEnemyNme_Dhalsim = "Dhalsim"
+KEnemyName_Honda = "Honda"
 
 function playerInputs:calcBoundingBoxes(me, enemy)
     --me
-    if me["facingRight"] then
+    if me["facingRight"] then                   -- note: distancne values are for charatcer VEGA
         self.m_MeNose = me["x"]  
         self.m_MeBack =  self.m_MeNose - 10
         self.m_MeReach = self.m_MeNose + 90
@@ -63,10 +65,14 @@ function playerInputs:calcBoundingBoxes(me, enemy)
 
     --enemy
     local strEnemyName = enemy["fighter"]
-    local Dicke = 10
-    local Schlagweite = 65  --default
+    local Dicke = 10        -- default
+    local Schlagweite = 65  -- default
     if strEnemyName == KEnemyName_Vega then
         Schlagweite = 90
+    elseif strEnemyName == KEnemyNme_Dhalsim then
+        Schlagweite = 120
+    elseif strEnemyName == KEnemyName_Honda then
+        Dicke = 15
     end
     
     if enemy["facingRight"] then
@@ -192,7 +198,7 @@ function playerInputs:calc_Inputs(me, enemy)
             strGegnerActivity = "switch"
         end
 
-        Draw.DrawAtBottom(strMagicBulletDistance..strGegnerImpaired..strWeCanHitGegner.."E:"..strGegnerActivity..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach))
+        Draw.DrawAtBottom(strMagicBulletDistance..strGegnerImpaired..strWeCanHitGegner.."E:"..strGegnerActivity..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach)..",d"..tostring(self.m_Gegner_DistanceNose2Nose))
     end
 
 

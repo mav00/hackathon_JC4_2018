@@ -1,14 +1,18 @@
-
-
 local playerAction = {}
-local playerAction_mt = {__index = playerAction}
 
-function playerAction.new()
-   self.i = 0
-   setmetatable(self, playerAction_mt)
-   return self
+playerAction.__index = playerAction -- failed table lookups on the instances should fallback to the class table, to get methods
+setmetatable(playerAction, {
+  __call = function (cls, ...)
+    return cls.new(...)
+  end,
+})
+
+function playerAction.new(init)
+   local t = setmetatable({}, { __index = playerAction })
+
+  t.i = 0
+  return t
 end
-
 
 --[[
      MOVEMENT ACTIONS
@@ -67,9 +71,13 @@ function playerAction:airPunch(me)
    local result = {}
    if self.i < 40 then  -- up
       result["Up"] = true
-    result[forward(me)] = true
-   elseif self.i > 40 and self.i < 44 then -- MP
-    result["Y"] = true
+      result[self:forward(me)] = true
+   elseif self.i > 40 and self.i < 44
+   then -- MP
+      result["Y"] = true
+   elseif self.i >50
+   then
+      self.i = 0
    end
 
    self.i = self.i + 1
@@ -114,6 +122,7 @@ function playerAction:backward(me)
   end
   return "Right"
 end
+
 
 return playerAction
 

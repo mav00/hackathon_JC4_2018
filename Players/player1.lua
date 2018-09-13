@@ -2,7 +2,7 @@ require("Player")
 
 local _playerStrategie = require("playerStrategie")
 local _playerinputs = require("playerinputs")
---local _playerAction = require("playerAction")
+local _playerAction = require("playerAction")
 
 
 local Example = {}
@@ -17,7 +17,7 @@ function Example.new(player)
 
    self.m_playerStrategy = _playerStrategie.new(42)
    self.m_playerInputs = _playerinputs.new() 
-   --self.m_playerAction = _playerAction.new()
+   self.m_playerAction = _playerAction.new()
 
    return self
 end
@@ -52,7 +52,11 @@ function Example:advance(me, enemy)
 	x = enemy["fighter"]
 	self.m_playerInputs:calc_Inputs(me,enemy)
 	self.m_playerStrategy:doStrategie(me,enemy, m_playerInputs)
-	--result = self.m_playerAction:doAction(me)
+
+
+	
+
+	result = self.m_playerAction:airPunch(me)
 
 	--if me["attacking"] == true then
 	
@@ -87,21 +91,10 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "WORF"
+	return "space Worf"
 end
 
 
 
-function Example:airPunch(me)
-   local result = {}
-   if me.i < 40 then  -- up
-      result["Up"] = true
-	  result[me:forward(me)] = true
-   elseif me.i > 40 and me.i < 44 then -- MP
-	  result["Y"] = true
-   end
-   me.i = me.i + 1
-   return result
-end
 
 return Example

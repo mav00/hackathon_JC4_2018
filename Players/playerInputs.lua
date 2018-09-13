@@ -59,11 +59,11 @@ function playerInputs:calcBoundingBoxes(me, enemy)
     if me["facingRight"] then
         self.m_MeNose = me["x"]  
         self.m_MeBack =  self.m_MeNose - 10
-        self.m_MeReach = self.m_MeNose + 65
+        self.m_MeReach = self.m_MeNose + 90
 	else
         self.m_MeBack =  me["x"]
         self.m_MeNose = self.m_MeBack - 10 
-        self.m_MeReach = self.m_MeNose - 65
+        self.m_MeReach = self.m_MeNose - 90
 
     end
 

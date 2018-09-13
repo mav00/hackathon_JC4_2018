@@ -90,34 +90,17 @@ function Example:name()
 	return "WORF"
 end
 
-function Example:moveBackward(me)
-   local result = {}
-   result[self:backward(me)] = true
-   return result
-end
 
-function Example:moveForward(me)
-   local result = {}
-   result[self:forward(me)] = true
-   return result
-end
-
-function Example:lowPunch(me)
-  local result = {}
-  result["Down"] = true 
-  result["Y"] = true 
-  return result 
- end
 
 function Example:airPunch(me)
    local result = {}
-   if self.i < 40 then  -- up
+   if me.i < 40 then  -- up
       result["Up"] = true
-	  result[self:forward(me)] = true
-   elseif self.i > 40 and self.i < 44 then -- MP
+	  result[me:forward(me)] = true
+   elseif me.i > 40 and me.i < 44 then -- MP
 	  result["Y"] = true
    end
-   self.i = self.i + 1
+   me.i = me.i + 1
    return result
 end
 

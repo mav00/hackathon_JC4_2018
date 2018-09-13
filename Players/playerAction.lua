@@ -1,10 +1,10 @@
-require("Player")
+
 
 local playerAction = {}
 local playerAction_mt = {__index = playerAction}
 
-function playerAction.new(player)
-   local self = Player.new(player)
+function playerAction.new()
+   self.i = 0
    setmetatable(self, playerAction_mt)
    return self
 end
@@ -71,6 +71,7 @@ function playerAction:airPunch(me)
    elseif self.i > 40 and self.i < 44 then -- MP
     result["Y"] = true
    end
+
    self.i = self.i + 1
    return result
 end

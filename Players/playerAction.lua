@@ -98,6 +98,7 @@ function playerAction:airPunch(me)
    elseif self.i >50
    then
       self.i = 0
+      return result
    end
 
    self.i = self.i + 1
@@ -190,19 +191,19 @@ function playerAction:lowIntKickKey() return "A" end
 function playerAction:mediumIntKickKey() return "B" end
 function playerAction:highIntKickKey() return "C" end
 
-function playerAction:lowIntKickKey()
+function playerAction:lowIntKick()
  local result = {}
  result[self:lowIntKickKey()] = true
  return result
 end
 
-function playerAction:mediumIntKickKey() 
+function playerAction:mediumIntKick() 
  local result = {}
  result[self:mediumIntKickKey()] = true
  return result
 end
 
-function playerAction:highIntKickKey() 
+function playerAction:highIntKick() 
  local result = {}
  result[self:highIntKickKey()] = true
  return result
@@ -212,13 +213,13 @@ end
 function playerAction:lowKick(intensity)
     local result = {}
     if intensity == "L" then 
-      result[lowIntKick] = true
+      result[lowIntKickKey] = true
     end
     if intensity == "M" then 
-      result[mediumIntKick] = true
+      result[mediumIntKickKey] = true
     end
     if intensity == "H" then 
-      result[highIntKick] = true
+      result[highIntKickKey] = true
     end
     result["Down"] = true
     return result
@@ -235,6 +236,7 @@ function playerAction:airKick(me)
    elseif self.i >50
    then
       self.i = 0
+      return result
    end
 
    self.i = self.i + 1

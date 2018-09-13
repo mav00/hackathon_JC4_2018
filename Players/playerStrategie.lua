@@ -19,7 +19,8 @@ function playerStrategie.new(action, debugFlag)
 end
 
 
-oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dAirKickHigh = "o init", "d crouch block", "d block", "d kick low", "d punch low", "d air kick high"
+oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dPunchMid, dPunchHigh, dAirKickHigh =
+"o init", "d crouch block", "d block", "d kick low", "d punch low", "d punch mid", "d punch high", "d air kick high"
 -------------------------------------------------------
 function playerStrategie:doStrategie(me, enemy, input)
   self.me = me
@@ -38,33 +39,27 @@ function playerStrategie:doStrategie(me, enemy, input)
   local attackDistanceKMid = 61
   local attackDistanceKLow = 41
   local attackDistanceThrow = 40
-  local blockDistance = 35
+  local blockDistance = 80
   local distToEnemy = me["distanceToOpponent"]
   local actionOngoing = self.action:isInAction()
  
   if actionOngoing then
     self:drawText(self.lastAction .. "~")
-    return getActionResult(self.lastAction)
+    return self:getActionResult(self.lastAction)
   end
   
   local r = oInit
  
   if enAttacking and magicBulletDanger then
     r = "defend magic"
-    a = self:actionDefendMagic()
+    --a = self:actionDefendMagic()
   elseif enAttacking then
-    if enCrouching and (distToEnemy < attackDistancePHigh) then
+    if enCrouching and (distToEnemy < blockDistance) then
       r = dCrouchBlock
     elseif (distToEnemy < blockDistance) then
       r = dBlock
-    elseif (distToEnemy < attackDistanceKLow) then
-      r = dKickLow
-    elseif (distToEnemy < attackDistancePLow) then
-      r = dPunchLow
-    elseif (distToEnemy < attackDistancePHigh) then
-      r = dBlock
     else
-      r = dAirKickHigh
+      r = dPunchHigh
     end
   else -- enemy not attacking
     if (distToEnemy < attackDistanceThrow) then
@@ -89,17 +84,21 @@ end
 
 function playerStrategie:getActionResult(a)
   r = {}
-  if dCrouchBlock then
+  if dCrouchBlock == a then
     r = self.action:goBackward(self.me)
     r["Down"] = true
-  elseif dBlock then
+  elseif dBlock == a then
     r = self.action:goBackward(self.me)
-  elseif dKickLow then
-    r = self.action:kick("L")
-  elseif dPunchLow then
-    r = self.action:punch("L")
-  elseif dAirKickHigh then
-    r = self.action:airPunch(me)
+  elseif dKickLow == a then
+    r = self.action:lowIntKick()
+  elseif dPunchLow == a then
+    r = self.action:lowIntPunch()
+  elseif dPunchMid == a then
+    r = self.action:mediumIntPunch()
+  elseif dPunchHigh == a then
+    r = self.action:highIntPunch()
+  elseif dAirKickHigh == a then
+    r = self.action:airPunch(self.me)
   end
   return r
 end

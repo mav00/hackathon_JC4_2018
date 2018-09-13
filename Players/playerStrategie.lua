@@ -49,10 +49,10 @@ function playerStrategie:doStrategie(me, enemy, input)
   local enCrouching = (enemy["crounching"] == true)
   local magicBulletDanger = input.m_magicBullet
   local shouldApproach = input.m_Gegner_CanBeHitByUs
-  local attackDistanceHigh = 100
-  local attackDistanceMid = 80
-  local attackDistanceLow = 60
-  local blockDistance = 50
+  local attackDistanceHigh = 90
+  local attackDistanceMid = 74
+  local attackDistanceLow = 80
+  local blockDistance = 60
   local distToEnemy = me["distanceToOpponent"]
   local actionOngoing = false
  
@@ -68,41 +68,35 @@ function playerStrategie:doStrategie(me, enemy, input)
     r = "defend magic"
   elseif enAttacking then
     if enCrouching and (distToEnemy < attackDistanceHigh) then
-      -- crouch block
-      r = "crouch block"
+      r = "d crouch block"
     elseif (distToEnemy < blockDistance) then
-      -- block
-      r = "block"
+      r = "d block"
     elseif (distToEnemy < attackDistanceLow) then
-      -- punch light
-      r = "punch light"
+      r = "d punch light"
     elseif (distToEnemy < attackDistanceMid) then
-      -- punch mid
-      r = "punch mid"
+      r = "d punch mid"
     elseif (distToEnemy < attackDistanceHigh) then
-      -- crouch kick high
-      r = "crouch kick high"
+      r = "d block"
     else
-      -- air kick
-      r = "air kick"
+      r = "air kick high"
     end
   else -- enemy not attacking
     if (distToEnemy < blockDistance) then
-      -- throw
       r = "throw"
     elseif (distToEnemy < attackDistanceLow) then
-      -- kick light
-      r = "kick light"
-    elseif (distToEnemy < attackDistanceHigh) then
-      -- kick high
-      r = "kick high"
+      r = "punch light"
+    elseif (distToEnemy < attackDistanceMid) then
+      if enCrouching then
+        r = "air kick high"
+      else
+        r = "punch mid"
+      end
     else
-      -- rolling crystal flash
       r = "rolling crystal flash"
     end
   end
   
-  self.lastActionString = r
+  self.lastActionString = r .. " " .. distToEnemy
   self:drawText(self.lastActionString)
 end
 
@@ -112,9 +106,9 @@ function playerStrategie:actionDefendMagic()
   if bulletDistance > 60 then 
     return {}
   elseif bulletDistance < 50 then 
-    return self:moveBackward(self.me)
+    return self.action:goBackward(self.me)
   else
-    return self:airPunch(self.me)
+    return self.action:airPunch(self.me)
   end
 end
 

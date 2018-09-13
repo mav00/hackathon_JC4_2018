@@ -109,6 +109,25 @@ function playerAction:airPunch(me)
    return result
 end
 
+function playerAction:jumpPunch(me)
+   local result = {}
+   if self.i > 9 then
+     result[self:lowIntPunchKey()] = true
+   end
+   
+   if self.i < 30 then  -- up
+      result["Up"] = true
+  end
+  
+  if self.i > 30 and (me["y"] < 1) then
+      self.i = 0
+      return result
+   end
+
+   self.i = self.i + 1
+   return result
+end
+
 -- medium intensity rainbow
 function playerAction:rainbowM(me)
    local result = {}
@@ -192,6 +211,45 @@ function playerAction:stardustDropH(me)
    self.i = self.i + 1
    return result
 end
+
+-- royal christal flash
+function playerAction:royalChristalFlash(me)
+   local result = {}
+   if self.i < 80 then 
+      result[self:backward(me)] = true
+   elseif self.i > 80 and self.i < 120
+   then -- up + punch
+      result[self:forward(me)] = true
+      result[self:highIntPunchKey()] = true
+   elseif self.i > 120
+   then
+      self.i = 0
+      return result
+   end
+
+   self.i = self.i + 1
+   return result
+end
+
+-- sky high claw
+function playerAction:skyHighClaw(me)
+   local result = {}
+   if self.i < 150 then 
+      result["Down"] = true
+   elseif self.i > 150 and self.i < 170
+   then -- up + punch
+      result["Up"] = true
+      result[self:highIntPunchKey()] = true
+   elseif self.i > 170
+   then
+      self.i = 0
+      return result
+   end
+
+   self.i = self.i + 1
+   return result
+end
+
 
 
 --[[ KICKS ]]-- 

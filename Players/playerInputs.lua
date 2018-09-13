@@ -28,6 +28,7 @@ function playerInputs.new(a_bDebugOutAllowed)
    t.m_Gegner_Speed = fast
    t.m_Gegner_CanHitUs = true
    t.m_Gegner_CanBeHitByUs = false
+   t.m_Gegner_DistanceNose2Nose = 200
    t.m_ActivityEnemy = switcher
    t.m_GegnerImpaired = false
   return t
@@ -53,6 +54,7 @@ end
 fast, med, slow = 0, 1, 2
 sleeper, blocker, spammer, jumper, switcher = 0,1,2,3,4
 
+KEnemyName_Vega = "Vega"
 
 function playerInputs:calcBoundingBoxes(me, enemy)
     --me
@@ -68,14 +70,21 @@ function playerInputs:calcBoundingBoxes(me, enemy)
     end
 
     --enemy
+    local strEnemyName = enemy["fighter"]
+    local Dicke = 10
+    local Schlagweite = 65
+    if strEnemyName == KEnemyName_Vega then
+        Schlagweite = 90
+    end
+    
     if enemy["facingRight"] then
         self.m_EnemyNose = enemy["x"]  
-        self.m_EnemyBack =  self.m_EnemyNose - 10       -- TODO: enemy specific
-        self.m_EnemyReach = self.m_EnemyNose + 65       -- how far would the (longest non-magical body part) reach  TODO: Enemy specific
+        self.m_EnemyBack =  self.m_EnemyNose - Dicke       -- TODO: enemy specific
+        self.m_EnemyReach = self.m_EnemyNose + Schlagweite       -- how far would the (longest non-magical body part) reach  TODO: Enemy specific
 	else
         self.m_EnemyBack =  enemy["x"]
-        self.m_EnemyNose = self.m_EnemyBack - 10          -- TODO: enemy specific
-        self.m_EnemyReach = self.m_EnemyNose - 65       -- TODO: enemy specific
+        self.m_EnemyNose = self.m_EnemyBack - Dicke          -- TODO: enemy specific
+        self.m_EnemyReach = self.m_EnemyNose - Schlagweite       -- TODO: enemy specific
     end
 end
 
@@ -139,6 +148,9 @@ function playerInputs:calc_Inputs(me, enemy)
     end
     self.m_GegnerImpaired = enemy["dizzy"] or (self.PenaltyTime > 0)
 
+    --- nose-to-nose distance to enemny
+    self.m_Gegner_DistanceNose2Nose = math.abs( self.m_MeNose - self.m_EnemyNose )
+
     --enemy strategy/attitude/activity based on character and long term observation
     -- TODO: enemy specific
     if strEnemyName == "Ryu" then
@@ -155,13 +167,22 @@ function playerInputs:calc_Inputs(me, enemy)
     if self.m_bDebugOutAllowed then
         local strGegnerCanHitUs = "";
         local strWeCanHitGegner ="";
+        local strGegnerImpaired ="";
         if(self.m_Gegner_CanHitUs) then
             strGegnerCanHitUs = "!"
         end
         if self.m_Gegner_CanBeHitByUs then
             strWeCanHitGegner = "!"
         end
-        Draw.DrawAtBottom(strWeCanHitGegner.."E:"..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach))
+        if self.m_GegnerImpaired then
+            strGegnerImpaired = "X"
+        end
+        local strMagicBulletDistance = ""
+        if(self.m_magicBullet) then
+            strMagicBulletDistance = "B: "..tostring(self.m_magicBulletDistance)..",   "
+        end
+
+        Draw.DrawAtBottom(strMagicBulletDistance..strGegnerImpaired..strWeCanHitGegner.."E:"..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach).."  -> dist="..tostring(self.m_Gegner_DistanceNose2Nose))
     end
 
 

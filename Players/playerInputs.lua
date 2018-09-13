@@ -14,6 +14,11 @@ function playerInputs.new(a_bDebugOutAllowed)
    -- Your constructor stuff
    t.PenaltyTime = 0
    t.bEnemyUsedMagic = false
+   t.SpamMeasurement = {}
+   for i = 1,300 do
+        t.SpamMeasurement[i] = false
+   end
+   t.SpamMeasurementIndex = 1;
 
    t.m_bDebugOutAllowed = a_bDebugOutAllowed
    t.m_MeBack = 0
@@ -35,19 +40,6 @@ function playerInputs.new(a_bDebugOutAllowed)
 end
 
 
---eingabe m_Fluchtplatz 0..500
---eingabe m_magicGefahr bool
---eingabe m_magicDistance 0..200
---eingabe m_GegnerStats_Speed {fast, med, slow}
---eingabe m_Gegner_CanBeHitByUs
---eingabe m_Gegner_CanHitUs
---eingabe m_ActivityEnemy
-            -- spam
-            -- block
-            -- nichts
-            -- jumper
-            -- switcher
-            -- ....
 
 
 
@@ -72,7 +64,7 @@ function playerInputs:calcBoundingBoxes(me, enemy)
     --enemy
     local strEnemyName = enemy["fighter"]
     local Dicke = 10
-    local Schlagweite = 65
+    local Schlagweite = 65  --default
     if strEnemyName == KEnemyName_Vega then
         Schlagweite = 90
     end
@@ -140,11 +132,11 @@ function playerInputs:calc_Inputs(me, enemy)
     else
         if self.bEnemyUsedMagic then
             self.bEnemyUsedMagic = false;
-            self.PenaltyTime = 10
+            self.PenaltyTime = 5
         end
     end
-    if(self.PenaltyTime > 1) then
-        self.PenaltyTime = self.PenaltyTime -1
+    if(self.PenaltyTime > 0) then
+        self.PenaltyTime = self.PenaltyTime - 1
     end
     self.m_GegnerImpaired = enemy["dizzy"] or (self.PenaltyTime > 0)
 
@@ -152,22 +144,33 @@ function playerInputs:calc_Inputs(me, enemy)
     self.m_Gegner_DistanceNose2Nose = math.abs( self.m_MeNose - self.m_EnemyNose )
 
     --enemy strategy/attitude/activity based on character and long term observation
-    -- TODO: enemy specific
-    if strEnemyName == "Ryu" then
-        self.m_ActivityEnemy = fast
-    elseif strEnemyName == "Honda" then
-        self.m_ActivityEnemy = fast
+    --- calc spamminess
+    self.SpamMeasurement[self.SpamMeasurementIndex] = enemy["attacking"] or enemy["magic"] or enemy["attack"] or enemy["remoteAttack"]
+    self.SpamMeasurementIndex = self.SpamMeasurementIndex + 1
+    if self.SpamMeasurementIndex > 300 then
+        self.SpamMeasurementIndex = 1
+    end
+    local SpamCount = 0
+    for i=1,300 do
+        if self.SpamMeasurement[i] then
+            SpamCount = SpamCount + 1
+        end
+    end
+    if SpamCount > 200 then
+        self.m_ActivityEnemy = spammer
+    elseif SpamCount < 10 then
+        self.m_ActivityEnemy = sleeper
     else
-        self.m_ActivityEnemy = switcher
+        self.m_ActivityEnemy  = switcher
     end
 
 
-
-
+    -- debugging
     if self.m_bDebugOutAllowed then
         local strGegnerCanHitUs = "";
         local strWeCanHitGegner ="";
         local strGegnerImpaired ="";
+        local strGegnerActivity =""
         if(self.m_Gegner_CanHitUs) then
             strGegnerCanHitUs = "!"
         end
@@ -175,14 +178,21 @@ function playerInputs:calc_Inputs(me, enemy)
             strWeCanHitGegner = "!"
         end
         if self.m_GegnerImpaired then
-            strGegnerImpaired = "X"
+            strGegnerImpaired = "X"..tostring(self.PenaltyTime)
         end
         local strMagicBulletDistance = ""
         if(self.m_magicBullet) then
             strMagicBulletDistance = "B: "..tostring(self.m_magicBulletDistance)..",   "
         end
+        if(self.m_ActivityEnemy == spammer) then
+            strGegnerActivity = "spam"
+        elseif self.m_ActivityEnemy == sleeper then
+            strGegnerActivity = "sleep"
+        else
+            strGegnerActivity = "switch"
+        end
 
-        Draw.DrawAtBottom(strMagicBulletDistance..strGegnerImpaired..strWeCanHitGegner.."E:"..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach).."  -> dist="..tostring(self.m_Gegner_DistanceNose2Nose))
+        Draw.DrawAtBottom(strMagicBulletDistance..strGegnerImpaired..strWeCanHitGegner.."E:"..strGegnerActivity..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach))
     end
 
 

@@ -54,7 +54,8 @@ function Example:advance(me, enemy)
 	self.m_playerStrategy:doStrategie(me,enemy, self.m_playerInputs)
 
 
-	
+	--result =  self.m_playerAction:rainbowM(me)
+
 
 	
 
@@ -91,7 +92,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "Space Worf "
+	return "Space Worf"
 end
 
 

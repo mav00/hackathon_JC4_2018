@@ -1,5 +1,10 @@
 require("Player")
 
+local _playerStrategie = require("playerStrategie")
+local _playerinputs = require("playerinputs")
+--local _playerAction = require("playerAction")
+
+
 local Example = {}
 setmetatable(Example, {__index = Player})
 local Example_mt = {__index = Example}
@@ -9,6 +14,10 @@ function Example.new(player)
    setmetatable(self, Example_mt)
 
    self.i = 0 
+
+   self.m_playerStrategy = _playerStrategie.new(42)
+   self.m_playerInputs = _playerinputs.new() 
+   --self.m_playerAction = _playerAction.new()
 
    return self
 end
@@ -37,38 +46,25 @@ end
 
 
 function Example:advance(me, enemy)
-	if me["attacking"] == true then
-		self.i = 0
-		return {}
-	end
 
-	if self.i == 0 then
-		if enemy["attaking"] then 
-			if enemy["magic"] and enemy["remoteAttack"] then
-				if self:distanceToMagic(me, enemy) > 60 then 
-					return {}
-				elseif self:distanceToMagic(me, enemy) < 50 then 
-					return self:moveBackward(me)
-				else
-					return self:airPunch(me)
-				end
-			end  				
-		else 
-			if me["distanceToOpponent"] > 90 then
-				return self:moveForward(me)
-			elseif me["distanceToOpponent"] < 70 then
-				return self:lowPunch(me)
-			else 
-				return self:airPunch(me) 
-			end
-		end 
-	end
+	local result = {}
+	--calc_hitbox(me,enemy)
+	x = enemy["fighter"]
+	self.m_playerInputs:calc_Inputs(me,enemy)
+	self.m_playerStrategy:doStrategie(me,enemy, m_playerInputs)
+	--result = self.m_playerAction:doAction(me)
 
-	if self.i > 80 then
-		self.i = 0
-	end 
+	--if me["attacking"] == true then
+	
 
-	return self:airPunch(me)
+	
+		--if enemy["attaking"] then 
+		--	if enemy["magic"] and enemy["remoteAttack"] then
+		
+
+	
+	return result
+
 end
 
 function Example:fighter()

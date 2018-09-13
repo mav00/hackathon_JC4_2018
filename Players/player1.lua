@@ -16,7 +16,7 @@ function Example.new(player)
    self.i = 0 
    self.m_playerAction = _playerAction.new(false)
    self.m_playerStrategy = _playerStrategie.new(self.m_playerAction,false)
-   self.m_playerInputs = _playerinputs.new(false) 
+   self.m_playerInputs = _playerinputs.new(true) 
    
 
    return self
@@ -51,7 +51,7 @@ function Example:advance(me, enemy)
 	--calc_hitbox(me,enemy)
 	x = enemy["fighter"]
 	self.m_playerInputs:calc_Inputs(me,enemy)
-	result = self.m_playerStrategy:doStrategie(me,enemy, self.m_playerInputs)
+    result = self.m_playerStrategy:doStrategie(me,enemy, self.m_playerInputs)
 	return result
 
 end
@@ -67,7 +67,7 @@ function Example:fighter()
 	-- return "Zangief"
 	-- return "Dhalsim"
 	-- return "Sagat"
-	return "Vega"
+	 return "Vega"
 	-- return "THawk"
 	-- return "Feilong"
 	-- return "DeeJay"
@@ -76,7 +76,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "Space Worf"
+	return "HaraldDucken"
 end
 
 

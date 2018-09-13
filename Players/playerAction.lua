@@ -1,5 +1,9 @@
 local playerAction = {}
 
+local throwDuration = 30
+local throwDurationMid = 6
+local throwDurationShort = 3
+
 playerAction.__index = playerAction -- failed table lookups on the instances should fallback to the class table, to get methods
 setmetatable(playerAction, {
   __call = function (cls, ...)
@@ -108,15 +112,16 @@ end
 -- medium intensity rainbow
 function playerAction:rainbowM(me)
    local result = {}
-   if self.i < 3 then  -- back
-      result[self:backward(me)] = true
-   elseif self.i > 3 and self.i < 10
+   if self.i <= throwDurationShort then  -- back
+      result[self:forward(me)] = true
+   elseif self.i > throwDurationShort and self.i < throwDuration
    then -- back + punch
-      result[self:backward(me)] = true
-      result[self:mediumIntPunch()] = true
-   elseif self.i >10
+      result[self:forward(me)] = true
+      result[self:mediumIntPunchKey()] = true
+   elseif self.i > throwDuration
    then
       self.i = 0
+      return result
    end
 
    self.i = self.i + 1
@@ -126,19 +131,20 @@ end
 -- medium intensity stardust drop
 function playerAction:stardustDropM(me)
    local result = {}
-   if self.i < 3 then 
+   if self.i < throwDurationShort then 
       result[self:forward(me)] = true
       result["Up"]=true
    end
    if self.i < 6 then  -- back
       result[self:forward(me)] = true
-   elseif self.i > 6 and self.i < 13
+   elseif self.i > 6 and self.i < throwDuration
    then -- back + punch
       result[self:backward(me)] = true
-      result[self:mediumIntPunch()] = true
-   elseif self.i > 13
+      result[self:mediumIntPunchKey()] = true
+   elseif self.i > throwDuration
    then
       self.i = 0
+      return result
    end
 
    self.i = self.i + 1
@@ -148,15 +154,16 @@ end
 -- high intensity rainbow
 function playerAction:rainbowH(me)
    local result = {}
-   if self.i < 3 then  -- back
+   if self.i < throwDurationShort then  -- back
       result[self:backward(me)] = true
-   elseif self.i > 3 and self.i < 10
+   elseif self.i > throwDurationShort and self.i < throwDuration
    then -- back + punch
       result[self:backward(me)] = true
-      result[self:highIntPunch()] = true
-   elseif self.i >10
+      result[self:highIntPunchKey()] = true
+   elseif self.i > throwDuration
    then
       self.i = 0
+      return result
    end
 
    self.i = self.i + 1
@@ -166,19 +173,20 @@ end
 -- high intensity stardust drop
 function playerAction:stardustDropH(me)
    local result = {}
-   if self.i < 3 then 
+   if self.i < throwDurationShort then 
       result[self:forward(me)] = true
       result["Up"]=true
    end
    if self.i < 6 then  -- back
       result[self:forward(me)] = true
-   elseif self.i > 6 and self.i < 13
+   elseif self.i > 6 and self.i < throwDuration
    then -- back + punch
       result[self:backward(me)] = true
-      result[self:highIntPunch()] = true
-   elseif self.i > 13
+      result[self:highIntPunchKey()] = true
+   elseif self.i > throwDuration
    then
       self.i = 0
+      return result
    end
 
    self.i = self.i + 1
@@ -213,13 +221,13 @@ end
 function playerAction:lowKick(intensity)
     local result = {}
     if intensity == "L" then 
-      result[lowIntKickKey] = true
+      result[self:lowIntKickKey()] = true
     end
     if intensity == "M" then 
-      result[mediumIntKickKey] = true
+      result[self:mediumIntKickKey()] = true
     end
     if intensity == "H" then 
-      result[highIntKickKey] = true
+      result[self:highIntKickKey()] = true
     end
     result["Down"] = true
     return result
@@ -232,7 +240,7 @@ function playerAction:airKick(me)
       result[self:forward(me)] = true
    elseif self.i > 40 and self.i < 44
    then -- MP
-      result["B"] = true
+      result["C"] = true
    elseif self.i >50
    then
       self.i = 0

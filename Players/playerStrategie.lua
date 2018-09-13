@@ -19,8 +19,10 @@ function playerStrategie.new(action, debugFlag)
 end
 
 
-oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dPunchMid, dPunchHigh, dAirKickHigh =
-"o init", "d crouch block", "d block", "d kick low", "d punch low", "d punch mid", "d punch high", "d air kick high"
+oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dPunchMid, dPunchHigh, dCrouchKickHigh, dAirKickHigh,
+punchLow, punchMid, punchHigh, airKickHigh, rainbowMid =
+"o init", "d crouch block", "d block", "d kick low", "d punch low", "d punch mid", "d punch high", "d crouch kick high", "d air kick high",
+"punch low", "punch mid", "punch high", "air kick high", "rainbow mid"
 -------------------------------------------------------
 function playerStrategie:doStrategie(me, enemy, input)
   self.me = me
@@ -31,16 +33,16 @@ function playerStrategie:doStrategie(me, enemy, input)
   local enCrouching = (enemy["crounching"] == true)
   local magicBulletDanger = input.m_magicBullet
   local shouldApproach = input.m_Gegner_CanBeHitByUs
-  local attackDistanceSlide = 104
-  local attackDistancePHigh = 79
-  local attackDistancePMid = 74
-  local attackDistancePLow = 45
-  local attackDistanceKHigh = 50
-  local attackDistanceKMid = 61
-  local attackDistanceKLow = 41
-  local attackDistanceThrow = 40
+  local attackDistanceSlide = 118
+  local attackDistancePHigh = 99
+  local attackDistancePMid = 93
+  local attackDistancePLow = 58
+  local attackDistanceKHigh = 63
+  local attackDistanceKMid = 74
+  local attackDistanceKLow = 54
+  local attackDistanceThrow = 25
   local blockDistance = 80
-  local distToEnemy = me["distanceToOpponent"]
+  local distToEnemy = input.m_Gegner_DistanceNose2Nose
   local actionOngoing = self.action:isInAction()
  
   if actionOngoing then
@@ -54,26 +56,29 @@ function playerStrategie:doStrategie(me, enemy, input)
     r = "defend magic"
     --a = self:actionDefendMagic()
   elseif enAttacking then
-    if enCrouching and (distToEnemy < blockDistance) then
+    if enCrouching and input.m_Gegner_CanHitUs then
+      r = dAirKickHigh
+    elseif input.m_Gegner_CanHitUs then
       r = dCrouchBlock
-    elseif (distToEnemy < blockDistance) then
-      r = dBlock
+    elseif (distToEnemy < attackDistanceSlide) then
+      r = dCrouchKickHigh -- slide
     else
-      r = dPunchHigh
+      -- chill
     end
   else -- enemy not attacking
     if (distToEnemy < attackDistanceThrow) then
-      r = "throw"
+      r = rainbowMid
     elseif (distToEnemy < attackDistancePLow) then
-      r = "punch light"
+      r = punchLow
     elseif (distToEnemy < attackDistancePMid) then
       if enCrouching then
-        r = "air kick high"
+        r = airKickHigh
       else
-        r = "punch mid"
+        r = punchMid
       end
     else
       r = "rolling crystal flash"
+      
     end
   end
   
@@ -97,8 +102,20 @@ function playerStrategie:getActionResult(a)
     r = self.action:mediumIntPunch()
   elseif dPunchHigh == a then
     r = self.action:highIntPunch()
+  elseif dCrouchKickHigh == a then
+    r = self.action:lowKick("H")
   elseif dAirKickHigh == a then
-    r = self.action:airPunch(self.me)
+    r = self.action:airKick(self.me)
+  elseif punchLow == a then
+    r = self.action:lowIntPunch()
+  elseif punchMid == a then
+    r = self.action:mediumIntPunch()
+  elseif punchHigh == a then
+    r = self.action:highIntPunch()
+  elseif airKickHigh == a then
+    r = self.action:airKick(self.me)
+  elseif rainbowMid == a then
+    r = self.action:rainbowM(self.me)
   end
   return r
 end
@@ -117,7 +134,7 @@ end
 
 function playerStrategie:drawText(text)
   if self.debug then
-    Draw.DrawAtBottom(text .. " " .. self.me["distanceToOpponent"])
+    Draw.DrawAtBottom(text .. " " .. self.input.m_Gegner_DistanceNose2Nose)
   end
 end
 

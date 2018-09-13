@@ -47,21 +47,41 @@ function playerAction:jump(me)
 end
 
 --[[ PUNCHES ]]-- 
-function playerAction:lowIntPunch() return "X" end
-function playerAction:mediumIntPunch() return "Y" end
-function playerAction:highIntPunch() return "Z" end
+
+function playerAction:lowIntPunchKey() return "X" end
+function playerAction:mediumIntPunchKey() return "Y" end
+function playerAction:highIntPunchKey() return "Z" end
+
+function playerAction:lowIntPunch()
+ local result = {}
+ result[self:lowIntPunchKey()] = true
+ return result
+end
+
+function playerAction:mediumIntPunch()
+ local result = {}
+ result[self:mediumIntPunchKey()] = true
+ return result
+end
+
+function playerAction:highIntPunch()
+ local result = {}
+ result[self:highIntPunchKey()] = true
+ return result
+end
+
 
 -- punch and up/down move
 function playerAction:lowPunch(intensity)
     local result = {}
     if intensity == "L" then 
-      result[lowIntPunch] = true
+      result[self:lowIntPunchKey()] = true
     end
     if intensity == "M" then 
-      result[mediumIntPunch] = true
+      result[self:mediumIntPunchKey()] = true
     end
     if intensity == "H" then 
-      result[highIntPunch] = true
+      result[self:highIntPunchKey()] = true
     end
     result["Down"] = true
     return result
@@ -166,9 +186,27 @@ end
 
 
 --[[ KICKS ]]-- 
-function lowIntKick() return "A" end
-function mediumIntKick() return "B" end
-function highIntKick() return "C" end
+function playerAction:lowIntKickKey() return "A" end
+function playerAction:mediumIntKickKey() return "B" end
+function playerAction:highIntKickKey() return "C" end
+
+function playerAction:lowIntKickKey()
+ local result = {}
+ result[self:lowIntKickKey()] = true
+ return result
+end
+
+function playerAction:mediumIntKickKey() 
+ local result = {}
+ result[self:mediumIntKickKey()] = true
+ return result
+end
+
+function playerAction:highIntKickKey() 
+ local result = {}
+ result[self:highIntKickKey()] = true
+ return result
+end
 
 -- punch and up/down move
 function playerAction:lowKick(intensity)
@@ -186,6 +224,24 @@ function playerAction:lowKick(intensity)
     return result
 end
 
+function playerAction:airKick(me)
+   local result = {}
+   if self.i < 40 then  -- up
+      result["Up"] = true
+      result[self:forward(me)] = true
+   elseif self.i > 40 and self.i < 44
+   then -- MP
+      result["B"] = true
+   elseif self.i >50
+   then
+      self.i = 0
+   end
+
+   self.i = self.i + 1
+   return result
+end
+
+
 
 function playerAction:forward(me)
   if me["facingRight"] then
@@ -202,7 +258,7 @@ function playerAction:backward(me)
 end
 
 function playerAction:isInAction()
- return self.i == 0
+ return self.i > 0
 end
 
 return playerAction

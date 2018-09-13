@@ -75,6 +75,7 @@ function playerInputs:calcBoundingBoxes(me, enemy)
     local Schlagweite = 65
     if strEnemyName == KEnemyName_Vega then
         Schlagweite = 90
+    end
     
     if enemy["facingRight"] then
         self.m_EnemyNose = enemy["x"]  

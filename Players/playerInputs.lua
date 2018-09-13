@@ -1,3 +1,33 @@
+local playerInputs = {}
+
+playerInputs.__index = playerInputs -- failed table lookups on the instances should fallback to the class table, to get methods
+setmetatable(playerInputs, {
+  __call = function (cls, ...)
+    return cls.new(...)
+  end,
+})
+
+function playerInputs.new(init)
+   local t = setmetatable({}, { __index = playerInputs })
+
+   -- Your constructor stuff
+   t.value = init
+   t.m_MeBack = 0
+   t.m_MeNose = 10
+   t.m_MeReach = 25
+   t.m_EnemyBack = 500
+   t.m_EnemyNose = 490
+   t.m_EnemyReach = 475
+   t.m_Fluchtplatz = 10
+   t.m_magicBullet = false
+   t.m_magicBulletDistance = 200
+   t.m_Gegner_Speed = fast
+   t.m_Gegner_CanHitUs = true
+   t.m_Gegner_CanBeHitByUs = false
+   t.m_ActivityEnemy = switcher
+  return t
+end
+
 
 --eingabe m_Fluchtplatz 0..500
 --eingabe m_magicGefahr bool
@@ -16,85 +46,90 @@
 
 
 fast, med, slow = 0, 1, 2
+sleeper, blocker, spammer, jumper, switcher = 0,1,2,3,4
 
 
-m_MeLeft = 0
-m_MeRight = 10
-
-function calcBoundingBoxes(me, enemy)
+function playerInputs:calcBoundingBoxes(me, enemy)
     --me
     if me["facingRight"] then
-        m_MeNose = me["x"]  
-        m_MeBack =  m_MeNose - 10
-        m_MeReach = m_MeNose + 15
+        self.m_MeNose = me["x"]  
+        self.m_MeBack =  self.m_MeNose - 10
+        self.m_MeReach = self.m_MeNose + 15
 	else
-        m_MeBack =  me["x"]
-        m_MeNose = meBack - 10 
-        m_MeReach = m_MeNose - 15
+        self.m_MeBack =  me["x"]
+        self.m_MeNose = self.meBack - 10 
+        self.m_MeReach = self.m_MeNose - 15
 
     end
 
     --enemy
     if enemy["facingRight"] then
-        m_EnemyNose = enemy["x"]  
-        m_EnemyBack =  m_EnemyNose - 10       -- TODO: enemy specific
-        m_EnemyReach = m_EnemyNose + 15       -- how far would the (longest non-magical body part) reach  TODO: Enemy specific
+        self.m_EnemyNose = enemy["x"]  
+        self.m_EnemyBack =  self.m_EnemyNose - 10       -- TODO: enemy specific
+        self.m_EnemyReach = self.m_EnemyNose + 15       -- how far would the (longest non-magical body part) reach  TODO: Enemy specific
 	else
-        m_EnemyBack =  enemy["x"]
-        m_EnemyNose = EnemyBack - 10          -- TODO: enemy specific
-        m_EnemyReach = m_EnemyNose - 15       -- TODO: enemy specific
+        self.m_EnemyBack =  enemy["x"]
+        self.m_EnemyNose = self.EnemyBack - 10          -- TODO: enemy specific
+        self.m_EnemyReach = self.m_EnemyNose - 15       -- TODO: enemy specific
     end
 end
 
 
 
 
-function calc_Inputs(me, enemy)
+function playerInputs:calc_Inputs(me, enemy)
 
     -- prep stuff
     calcBoundingBoxes(me, enemy)
     local bFacingRight = me["facingRight"]
+    local strEnemyName = enemy["fighter"]
 
 
     --Fluchtplatz
     if bFacingRight then
-        me.m_Fluchtplatz = m_MeBack     --space behind me on the left
+        self.m_Fluchtplatz = self.m_MeBack     --space behind me on the left
     else
-        me.m_Fluchtplatz = 500 - m_MeBack   --spece behind me on the right
+        self.m_Fluchtplatz = 500 - self.m_MeBack   --spece behind me on the right
     end
 
     --distance to magic
-    m_magicGefahr = enemy["magic"]
-    if(m_magicGefahr) then
-        m_magicDistance = math.abs(enemy["remoteAttackPos"] - m_MeNose)
+    self.m_magicBullet = enemy["magic"] and enemy["remoteAttack"]
+    if(self.m_magicBullet) then
+        self.m_magicBulletDistance = math.abs(enemy["remoteAttackPos"] - self.m_MeNose)
     end
 
     --enemy speed
     -- TODO: enemy specific
-    local enemyname = enemy["fighter"]
-    if enemyname == "Ryu" then
-        m_Gegner_Speed = fast
-    elseif enemyname == "Honda" then
-        m_Gegner_Speed = fast
+    if strEnemyName == "Ryu" then
+        self.m_Gegner_Speed = fast
+    elseif strEnemyName == "Honda" then
+        self.m_Gegner_Speed = fast
     else
-        m_Gegner_Speed = fast
+        self.m_Gegner_Speed = fast
     end
 
     --bedrohung
     if bFacingRight then
-        m_Gegner_CanHitUs = m_EnemyReach < m_MeNose
+        self.m_Gegner_CanHitUs = self.m_EnemyReach < self.m_MeNose
     else
-        m_Gegner_CanHitUs = m_EnemyReach > m_MeNose
+        self.m_Gegner_CanHitUs = self.m_EnemyReach > self.m_MeNose
     end
 
     --chancen
     if bFacingRight then
-        m_Gegner_CanBeHitByUs =  m_MeReach > m_EnemyNose 
+        self.m_Gegner_CanBeHitByUs = self.m_MeReach > self.m_EnemyNose 
     else
-        m_Gegner_CanBeHitByUs = m_MeReach < m_EnemyNose
+        self.m_Gegner_CanBeHitByUs = self.m_MeReach < self.m_EnemyNose
     end
 
     --enemy strategy/attitude/activity based on character and long term observation
-    
+    -- TODO: enemy specific
+    if strEnemyName == "Ryu" then
+        self.m_ActivityEnemy = fast
+    elseif strEnemyName == "Honda" then
+        self.m_ActivityEnemy = fast
+    else
+        self.m_ActivityEnemy = switcher
+    end
 
 end

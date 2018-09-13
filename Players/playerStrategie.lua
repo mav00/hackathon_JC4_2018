@@ -14,32 +14,13 @@ function playerStrategie.new(action, debugFlag)
    t.action = action
    t.debug = debugFlag
    t.isStrategyOffensive = true
-   t.lastActionString = "init"
+   t.lastAction = oInit
   return t
 end
 
---eingabe m_Fluchtplatz 0..500
---eingabe m_magicBullet bool
---eingabe m_magicBulletDistance 0..200
---eingabe m_GegnerStats_Speed {fast, med, slow}
---eingabe m_Gegner_CanBeHitByUs
---eingabe m_Gegner_CanHitUs
---eingabe m_ActivityEnemy
-            -- spam
-            -- block
-            -- nichts
-            -- jumper
-            -- switcher
-            -- ....
 
---schreibt m_actionQueue
-
+oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dAirKickHigh = "o init", "d crouch block", "d block", "d kick low", "d punch low", "d air kick high"
 -------------------------------------------------------
--- Wieviel Zeit hab ich
--- Angriff vs Verteidigung vs Flucht?
--- AngriffsArt/Verteidungsart/Fluchtart
--- IdealAbstand (zB Sicherheitsabstand oder Angriffsabstand)
--- ActionQueue updaten (add/clear/..)
 function playerStrategie:doStrategie(me, enemy, input)
   self.me = me
   self.enemy = enemy
@@ -49,43 +30,48 @@ function playerStrategie:doStrategie(me, enemy, input)
   local enCrouching = (enemy["crounching"] == true)
   local magicBulletDanger = input.m_magicBullet
   local shouldApproach = input.m_Gegner_CanBeHitByUs
-  local attackDistanceHigh = 90
-  local attackDistanceMid = 74
-  local attackDistanceLow = 80
-  local blockDistance = 60
+  local attackDistanceSlide = 104
+  local attackDistancePHigh = 79
+  local attackDistancePMid = 74
+  local attackDistancePLow = 45
+  local attackDistanceKHigh = 50
+  local attackDistanceKMid = 61
+  local attackDistanceKLow = 41
+  local attackDistanceThrow = 40
+  local blockDistance = 35
   local distToEnemy = me["distanceToOpponent"]
-  local actionOngoing = false
+  local actionOngoing = self.action:isInAction()
  
   if actionOngoing then
-    self:drawText(self.lastActionString)
-    return
+    self:drawText(self.lastAction .. "~")
+    return getActionResult(self.lastAction)
   end
   
-  local r = "nix"
+  local r = oInit
  
   if enAttacking and magicBulletDanger then
-    self:actionDefendMagic()
     r = "defend magic"
+    a = self:actionDefendMagic()
   elseif enAttacking then
-    if enCrouching and (distToEnemy < attackDistanceHigh) then
-      r = "d crouch block"
+    if enCrouching and (distToEnemy < attackDistancePHigh) then
+      r = dCrouchBlock
     elseif (distToEnemy < blockDistance) then
-      r = "d block"
-    elseif (distToEnemy < attackDistanceLow) then
-      r = "d punch light"
-    elseif (distToEnemy < attackDistanceMid) then
-      r = "d punch mid"
-    elseif (distToEnemy < attackDistanceHigh) then
-      r = "d block"
+      r = dBlock
+    elseif (distToEnemy < attackDistanceKLow) then
+      r = dKickLow
+    elseif (distToEnemy < attackDistancePLow) then
+      r = dPunchLow
+    elseif (distToEnemy < attackDistancePHigh) then
+      r = dBlock
     else
-      r = "air kick high"
+      r = dAirKickHigh
     end
   else -- enemy not attacking
-    if (distToEnemy < blockDistance) then
+    if (distToEnemy < attackDistanceThrow) then
       r = "throw"
-    elseif (distToEnemy < attackDistanceLow) then
+    elseif (distToEnemy < attackDistancePLow) then
       r = "punch light"
-    elseif (distToEnemy < attackDistanceMid) then
+    elseif (distToEnemy < attackDistancePMid) then
       if enCrouching then
         r = "air kick high"
       else
@@ -96,8 +82,26 @@ function playerStrategie:doStrategie(me, enemy, input)
     end
   end
   
-  self.lastActionString = r .. " " .. distToEnemy
-  self:drawText(self.lastActionString)
+  self.lastAction = r
+  self:drawText(self.lastAction)
+  return self:getActionResult(self.lastAction)
+end
+
+function playerStrategie:getActionResult(a)
+  r = {}
+  if dCrouchBlock then
+    r = self.action:goBackward(self.me)
+    r["Down"] = true
+  elseif dBlock then
+    r = self.action:goBackward(self.me)
+  elseif dKickLow then
+    r = self.action:kick("L")
+  elseif dPunchLow then
+    r = self.action:punch("L")
+  elseif dAirKickHigh then
+    r = self.action:airPunch(me)
+  end
+  return r
 end
 
 function playerStrategie:actionDefendMagic()
@@ -114,7 +118,7 @@ end
 
 function playerStrategie:drawText(text)
   if self.debug then
-    Draw.DrawAtBottom(text)
+    Draw.DrawAtBottom(text .. " " .. self.me["distanceToOpponent"])
   end
 end
 

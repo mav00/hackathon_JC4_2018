@@ -12,6 +12,9 @@ function playerInputs.new(init)
    local t = setmetatable({}, { __index = playerInputs })
 
    -- Your constructor stuff
+   t.PenaltyTime = 0
+   t.bEnemyUsedMagic = false
+
    t.value = init
    t.m_MeBack = 0
    t.m_MeNose = 10
@@ -26,6 +29,7 @@ function playerInputs.new(init)
    t.m_Gegner_CanHitUs = true
    t.m_Gegner_CanBeHitByUs = false
    t.m_ActivityEnemy = switcher
+   t.m_GegnerImpaired = false
   return t
 end
 
@@ -55,11 +59,11 @@ function playerInputs:calcBoundingBoxes(me, enemy)
     if me["facingRight"] then
         self.m_MeNose = me["x"]  
         self.m_MeBack =  self.m_MeNose - 10
-        self.m_MeReach = self.m_MeNose + 15
+        self.m_MeReach = self.m_MeNose + 90
 	else
         self.m_MeBack =  me["x"]
-        self.m_MeNose = self.meBack - 10 
-        self.m_MeReach = self.m_MeNose - 15
+        self.m_MeNose = self.m_MeBack - 10 
+        self.m_MeReach = self.m_MeNose - 90
 
     end
 
@@ -67,11 +71,11 @@ function playerInputs:calcBoundingBoxes(me, enemy)
     if enemy["facingRight"] then
         self.m_EnemyNose = enemy["x"]  
         self.m_EnemyBack =  self.m_EnemyNose - 10       -- TODO: enemy specific
-        self.m_EnemyReach = self.m_EnemyNose + 15       -- how far would the (longest non-magical body part) reach  TODO: Enemy specific
+        self.m_EnemyReach = self.m_EnemyNose + 65       -- how far would the (longest non-magical body part) reach  TODO: Enemy specific
 	else
         self.m_EnemyBack =  enemy["x"]
-        self.m_EnemyNose = self.EnemyBack - 10          -- TODO: enemy specific
-        self.m_EnemyReach = self.m_EnemyNose - 15       -- TODO: enemy specific
+        self.m_EnemyNose = self.m_EnemyBack - 10          -- TODO: enemy specific
+        self.m_EnemyReach = self.m_EnemyNose - 65       -- TODO: enemy specific
     end
 end
 
@@ -81,10 +85,9 @@ end
 function playerInputs:calc_Inputs(me, enemy)
 
     -- prep stuff
-    --self:calcBoundingBoxes(me, enemy)
+    self:calcBoundingBoxes(me, enemy)
     local bFacingRight = me["facingRight"]
     local strEnemyName = enemy["fighter"]
-
 
     --Fluchtplatz
     if bFacingRight then
@@ -122,6 +125,19 @@ function playerInputs:calc_Inputs(me, enemy)
     else
         self.m_Gegner_CanBeHitByUs = self.m_MeReach < self.m_EnemyNose
     end
+    ----dizziness und panelty ausnutzen
+    if( enemy["magic"] ) then
+        self.bEnemyUsedMagic = true
+    else
+        if self.bEnemyUsedMagic then
+            self.bEnemyUsedMagic = false;
+            self.PenaltyTime = 10
+        end
+    end
+    if(self.PenaltyTime > 1) then
+        self.PenaltyTime = self.PenaltyTime -1
+    end
+    self.m_GegnerImpaired = enemy["dizzy"] or (self.PenaltyTime > 0)
 
     --enemy strategy/attitude/activity based on character and long term observation
     -- TODO: enemy specific
@@ -132,6 +148,19 @@ function playerInputs:calc_Inputs(me, enemy)
     else
         self.m_ActivityEnemy = switcher
     end
+
+
+
+    local strGegnerCanHitUs = "";
+    local strWeCanHitGegner ="";
+    if(self.m_Gegner_CanHitUs) then
+        strGegnerCanHitUs = "!"
+    end
+    if self.m_Gegner_CanBeHitByUs then
+        strWeCanHitGegner = "!"
+    end
+    Draw.DrawAtBottom(strWeCanHitGegner.."E:"..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach))
+
 
 end
 

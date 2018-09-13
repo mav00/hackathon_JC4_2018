@@ -1,5 +1,7 @@
 require("Player")
 local _playerStrategie = require("playerStrategie")
+local _playerinputs = require("playerinputs")
+local _playerAction = require("playerAction")
 
 local Example = {}
 setmetatable(Example, {__index = Player})
@@ -10,8 +12,9 @@ function Example.new(player)
    setmetatable(self, Example_mt)
 
    self.i = 0 
-  self.ps = _playerStrategie.new(42)
-  self.ps:getValue()
+   self.m_playerStrategy = _playerStrategie.new(42)
+   self.m_playerInputs = _playerinputs.new() 
+   self.m_playerAction = _playerAction.new()
    return self
 end
 
@@ -41,10 +44,9 @@ end
 function Example:advance(me, enemy)
 	local result = {}
 	calc_hitbox(me,enemy)
-	calc_Inputs(me,enemy)
-	doStrategie(me,enemy)
-	result = doAction(me)
-
+	self.m_playerInputs.calc_Inputs(me,enemy)
+	self.m_playerStrategy.doStrategie(me,enemy, m_playerInputs)
+	result = self.m_playerAction.doAction(me)
 
 	--if me["attacking"] == true then
 	

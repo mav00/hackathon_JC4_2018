@@ -8,14 +8,14 @@ setmetatable(playerInputs, {
   end,
 })
 
-function playerInputs.new(init)
+function playerInputs.new(a_bDebugOutAllowed)
    local t = setmetatable({}, { __index = playerInputs })
 
    -- Your constructor stuff
    t.PenaltyTime = 0
    t.bEnemyUsedMagic = false
 
-   t.value = init
+   t.m_bDebugOutAllowed = a_bDebugOutAllowed
    t.m_MeBack = 0
    t.m_MeNose = 10
    t.m_MeReach = 25
@@ -151,15 +151,18 @@ function playerInputs:calc_Inputs(me, enemy)
 
 
 
-    local strGegnerCanHitUs = "";
-    local strWeCanHitGegner ="";
-    if(self.m_Gegner_CanHitUs) then
-        strGegnerCanHitUs = "!"
+
+    if self.m_bDebugOutAllowed then
+        local strGegnerCanHitUs = "";
+        local strWeCanHitGegner ="";
+        if(self.m_Gegner_CanHitUs) then
+            strGegnerCanHitUs = "!"
+        end
+        if self.m_Gegner_CanBeHitByUs then
+            strWeCanHitGegner = "!"
+        end
+        Draw.DrawAtBottom(strWeCanHitGegner.."E:"..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach))
     end
-    if self.m_Gegner_CanBeHitByUs then
-        strWeCanHitGegner = "!"
-    end
-    Draw.DrawAtBottom(strWeCanHitGegner.."E:"..tostring(self.m_EnemyBack)..","..tostring(self.m_EnemyNose)..","..tostring(self.m_EnemyReach).."  "..strGegnerCanHitUs.."M: "..tostring(self.m_MeBack)..","..tostring(self.m_MeNose)..","..tostring(self.m_MeReach))
 
 
 end

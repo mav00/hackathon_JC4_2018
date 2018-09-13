@@ -70,12 +70,12 @@ end
 function Example:fighter()
 	-- return "Ryu"
 	-- return "Honda"
-	return "Blanka"
+	-- return "Blanka"
 	-- return "Guile"
 	-- return "Balrog"
 	-- return "Ken"
 	-- return "ChunLi"
-	-- return "Zangief"
+	return "Zangief"
 	-- return "Dhalsim"
 	-- return "Sagat"
 	-- return "Vega"
@@ -87,7 +87,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "Example2"
+	return "WORF"
 end
 
 function Example:moveBackward(me)

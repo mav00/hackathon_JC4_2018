@@ -124,8 +124,8 @@ function playerAction:backward(me)
 end
 
 function playerAction:isInAction()
-return self.i == 0
-
+ return self.i == 0
+end
 
 return playerAction
 

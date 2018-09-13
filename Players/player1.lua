@@ -37,38 +37,21 @@ end
 
 
 function Example:advance(me, enemy)
-	if me["attacking"] == true then
-		self.i = 0
-		return {}
-	end
+	local result = {}
+	calc_Inputs(me,enemy)
+	result = doStrategie(me,enemy)
 
-	if self.i == 0 then
-		if enemy["attaking"] then 
-			if enemy["magic"] and enemy["remoteAttack"] then
-				if self:distanceToMagic(me, enemy) > 60 then 
-					return {}
-				elseif self:distanceToMagic(me, enemy) < 50 then 
-					return self:moveBackward(me)
-				else
-					return self:airPunch(me)
-				end
-			end  				
-		else 
-			if me["distanceToOpponent"] > 90 then
-				return self:moveForward(me)
-			elseif me["distanceToOpponent"] < 70 then
-				return self:lowPunch(me)
-			else 
-				return self:airPunch(me) 
-			end
-		end 
-	end
 
-	if self.i > 80 then
-		self.i = 0
-	end 
+	--if me["attacking"] == true then
+	
 
-	return self:airPunch(me)
+	
+		--if enemy["attaking"] then 
+		--	if enemy["magic"] and enemy["remoteAttack"] then
+		
+
+	
+	return result
 end
 
 function Example:fighter()

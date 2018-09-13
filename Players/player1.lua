@@ -54,7 +54,7 @@ function Example:advance(me, enemy)
 	self.m_playerStrategy:doStrategie(me,enemy, self.m_playerInputs)
 
 
-	result =  self.m_playerAction:rainbowM(me)
+	--result =  self.m_playerAction:rainbowM(me)
 
 
 	

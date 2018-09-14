@@ -20,6 +20,8 @@ function playerStrategie.new(action, debugFlag)
    t.dizzyThrows = 2
    t.dizzyWait = 0
    t.forwardSteps = 0
+   t.lastDistToEnemy = 0
+   t.firstBlood = false
   return t
 end
 
@@ -31,6 +33,8 @@ function playerStrategie:startRound()
   self.dizzyThrows = 2
   self.dizzyWait = 0
   self.forwardSteps = 0
+  self.lastDistToEnemy = 0
+  self.firstBlood = false
 end
 
 
@@ -50,10 +54,11 @@ function playerStrategie:doStrategie(me, enemy, input)
   local enAttacking = (enemy["attacking"] == true)
   local meAttacking = (me["attacking"] == true)
   local enCrouching = (enemy["crounching"] == true)
+  local eitherApproach = (me["advancing"] or enemy["advancing"])
   local magicBulletDanger = input.m_magicBullet
   local shouldApproach = input.m_Gegner_CanBeHitByUs
   local airTop = 25
-  local attackDistanceSlide = 118
+  local attackDistanceSlide = 113
   local attackDistancePHigh = 98
   local attackDistancePMid = 92
   local attackDistancePLow = 57
@@ -63,6 +68,8 @@ function playerStrategie:doStrategie(me, enemy, input)
   local attackDistanceThrow = 25
   local blockDistance = 80
   local distToEnemy = input.m_Gegner_DistanceNose2Nose
+  local deltaDistToEnemy = (distToEnemy - self.lastDistToEnemy)
+  if enemy["blockOrHit"] then self.firstBlood = true end
   if not input.m_GegnerImpaired then
     self.dizzyThrows = 2
     self.dizzyWait = 0
@@ -139,7 +146,7 @@ function playerStrategie:doStrategie(me, enemy, input)
       r = slide
     elseif (distToEnemy < attackDistancePMid) then
         r = punchMid
-    elseif (distToEnemy < (attackDistancePMid + 20)) and (self.forwardSteps > 3) then
+    elseif (distToEnemy < (attackDistancePMid + 10)) and (((not firstBlood and (self.forwardSteps > 2))) or eitherApproach) then
         r = punchMid
     else
       r = goForward

@@ -77,6 +77,7 @@ function playerStrategie:doStrategie(me, enemy, input)
   local distToEnemy = input.m_Gegner_DistanceNose2Nose
   local deltaDistToEnemy = (distToEnemy - self.lastDistToEnemy)
   if enemy["blockOrHit"] then self.firstBlood = true end
+  self.action:setIsBeingHit(me["blockOrHit"])
   if not input.m_GegnerImpaired then
     self.dizzyThrows = 2
     self.dizzyWait = 0
@@ -153,7 +154,7 @@ function playerStrategie:doStrategie(me, enemy, input)
       r = slide
     elseif (distToEnemy < attackDistancePMid) then
       r = punchMid
-    elseif (distToEnemy < (attackDistancePMid + 10)) and (((not firstBlood and (self.forwardSteps > 2))) or (self.approachSteps > 8)) then
+    elseif (distToEnemy < (attackDistancePMid + 20)) and (((not firstBlood and (self.forwardSteps > 2))) or (self.approachSteps > 8)) then
       r = punchMid
     elseif (distToEnemy < attackDistancePHigh) then
       r = punchHigh

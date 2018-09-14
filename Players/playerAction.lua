@@ -4,7 +4,14 @@ local throwDuration = 30
 local throwDurationMid = 6
 local throwDurationShort = 3
 
-local minimumTriggerTime = 10
+local delayPunchLow = 15
+local delayPunchMid = 20
+local delayPunchHigh = 40
+local delayKickLow = 15
+local delayKickMid = 20
+local delayKickHigh = 30
+local delaySlide = 60
+
 
 playerAction.__index = playerAction -- failed table lookups on the instances should fallback to the class table, to get methods
 setmetatable(playerAction, {
@@ -17,11 +24,17 @@ function playerAction.new(init)
    local t = setmetatable({}, { __index = playerAction })
 
   t.i = 0
+  t.isBeingHit = false
   return t
 end
 
 function playerAction:startRound()
   self.i = 0
+  self.isBeingHit = false
+end
+
+function playerAction:setIsBeingHit(flag)
+  self.isBeingHit = flag
 end
 
 
@@ -65,7 +78,10 @@ function playerAction:highIntPunchKey() return "Z" end
 
 function playerAction:lowIntPunch()
   local result = {}
-  if self.i < minimumTriggerTime then
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif self.i < delayPunchLow then
     self.i = self.i + 1
     result[self:lowIntPunchKey()] = true
   else
@@ -77,7 +93,10 @@ end
 
 function playerAction:mediumIntPunch()
   local result = {}
-  if self.i < minimumTriggerTime then
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif self.i < delayPunchMid then
     self.i = self.i + 1
     result[self:mediumIntPunchKey()] = true
   else
@@ -89,7 +108,10 @@ end
 
 function playerAction:highIntPunch()
   local result = {}
-  if self.i < minimumTriggerTime then
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif self.i < delayPunchHigh then
     self.i = self.i + 1
     result[self:highIntPunchKey()] = true
   else
@@ -103,17 +125,20 @@ end
 -- punch and up/down move
 function playerAction:lowPunch(intensity)
   local result = {}
-  if self.i < minimumTriggerTime then
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif intensity == "L" and (self.i < delayPunchLow) then
     self.i = self.i + 1
-    if intensity == "L" then 
-      result[self:lowIntPunchKey()] = true
-    end
-    if intensity == "M" then 
-      result[self:mediumIntPunchKey()] = true
-    end
-    if intensity == "H" then 
-      result[self:highIntPunchKey()] = true
-    end
+    result[self:lowIntPunchKey()] = true
+    result["Down"] = true
+  elseif intensity == "M" and (self.i < delayPunchMid) then
+    self.i = self.i + 1 
+    result[self:mediumIntPunchKey()] = true
+    result["Down"] = true
+  elseif intensity == "H" and (self.i < delayPunchHigh) then
+    self.i = self.i + 1
+    result[self:highIntPunchKey()] = true
     result["Down"] = true
   else
     self.i = 0
@@ -124,7 +149,10 @@ end
     
 function playerAction:airPunch(me)
    local result = {}
-   if self.i < 40 then  -- up
+   if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif self.i < 40 then  -- up
       result["Up"] = true
       result[self:forward(me)] = true
    elseif self.i > 40 and self.i < 44 then -- MP
@@ -291,7 +319,10 @@ function playerAction:highIntKickKey() return "C" end
 
 function playerAction:lowIntKick()
   local result = {}
-  if self.i < minimumTriggerTime then
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif self.i < delayKickLow then
     self.i = self.i + 1
     result[self:lowIntKickKey()] = true
   else
@@ -303,7 +334,10 @@ end
 
 function playerAction:mediumIntKick() 
   local result = {}
-  if self.i < minimumTriggerTime then
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif self.i < delayKickMid then
     self.i = self.i + 1
     result[self:mediumIntKickKey()] = true
   else
@@ -315,7 +349,10 @@ end
 
 function playerAction:highIntKick() 
   local result = {}
-  if self.i < minimumTriggerTime then
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif self.i < delayKickHigh then
     self.i = self.i + 1
     result[self:highIntKickKey()] = true
   else
@@ -328,17 +365,20 @@ end
 -- punch and up/down move
 function playerAction:lowKick(intensity)
   local result = {}
-  if self.i < minimumTriggerTime then
-    self.i = self.i + 1
-    if intensity == "L" then 
-      result[self:lowIntKickKey()] = true
-    end
-    if intensity == "M" then 
-      result[self:mediumIntKickKey()] = true
-    end
-    if intensity == "H" then 
-      result[self:highIntKickKey()] = true
-    end
+  if self.isBeingHit then
+    self.i = 0
+    result = {}
+  elseif intensity == "L" and (self.i < delayKickLow) then
+    self.i = self.i + 1 
+    result[self:lowIntKickKey()] = true
+    result["Down"] = true
+  elseif intensity == "M" and (self.i < delayKickMid) then
+    self.i = self.i + 1 
+    result[self:mediumIntKickKey()] = true
+    result["Down"] = true
+  elseif intensity == "H" and (self.i < delaySlide) then
+    self.i = self.i + 1 
+    result[self:highIntKickKey()] = true
     result["Down"] = true
   else
     self.i = 0

@@ -24,7 +24,6 @@ function playerStrategie.new(action, debugFlag)
 end
 
 function playerStrategie:startRound()
-  console.writeline("start")
   self.lastAction = oInit
   self.airTopReached = false
   self.eyold = 0

@@ -144,8 +144,10 @@ function playerStrategie:doStrategie(me, enemy, input)
     if enCrouching then
       if (distToEnemy < attackDistancePLow) then
         r = vertPunchLow
-      else
+      elseif (distToEnemy < attackDistanceSlide) then
         r = slide --airKickHigh
+      else
+        r = goForward
       end
     elseif (distToEnemy < attackDistanceThrow) then
       r = rainbowMid

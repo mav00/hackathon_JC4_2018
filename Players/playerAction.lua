@@ -4,7 +4,7 @@ local throwDuration = 30
 local throwDurationMid = 6
 local throwDurationShort = 3
 
-local minimumTriggerTime = 10
+local minimumTriggerTime = 6
 
 playerAction.__index = playerAction -- failed table lookups on the instances should fallback to the class table, to get methods
 setmetatable(playerAction, {

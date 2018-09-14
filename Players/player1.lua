@@ -22,7 +22,7 @@ end
 function Example:startRound()
 	self.m_playerInputs.startRound()
 	self.m_playerAction.startRound()
-	self.m_playerAction.startRound()
+	self.m_playerStrategy.startRound()
 
 end
 

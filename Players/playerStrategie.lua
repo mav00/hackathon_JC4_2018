@@ -115,7 +115,7 @@ function playerStrategie:doStrategie(me, enemy, input)
     else
       r = goBackward
     end]]--
-    r = dCrouchKickHigh
+    r = dSlide
   elseif enAttacking then
     if enCrouching and input.m_Gegner_CanHitUs then
       r = dAirKickHigh
@@ -139,7 +139,7 @@ function playerStrategie:doStrategie(me, enemy, input)
       r = slide
     elseif (distToEnemy < attackDistancePMid) then
         r = punchMid
-    elseif (distToEnemy < (attackDistancePMid + 30)) and (self.forwardSteps > 2) then
+    elseif (distToEnemy < (attackDistancePMid + 20)) and (self.forwardSteps > 3) then
         r = punchMid
     else
       r = goForward
@@ -172,7 +172,7 @@ function playerStrategie:getActionResult(a)
     r = self.action:mediumIntPunch()
   elseif dPunchHigh == a then
     r = self.action:highIntPunch()
-  elseif dCrouchKickHigh == a then
+  elseif dSlide == a then
     r = self.action:lowKick("H")
   elseif dAirKickHigh == a then
     r = self.action:airKick(self.me)
@@ -192,6 +192,8 @@ function playerStrategie:getActionResult(a)
     r = self.action:jumpPunch(self.me, self.enemy)
   elseif skyHighClaw == a then
     r = self.action:skyHighClaw(self.me)
+  elseif slide == a then
+    r = self.action:lowKick("H")
   elseif goBackward == a then
     r = self.action:goBackward(self.me)
   elseif goForward == a then

@@ -12,30 +12,7 @@ function playerInputs.new(a_bDebugOutAllowed)
    local t = setmetatable({}, { __index = playerInputs })
 
    -- Your constructor stuff
-   t.PenaltyTime = 0
-   t.bEnemyUsedMagic = false
-   t.SpamMeasurement = {}
-   for i = 1,300 do
-        t.SpamMeasurement[i] = false
-   end
-   t.SpamMeasurementIndex = 1;
-
-   t.m_bDebugOutAllowed = a_bDebugOutAllowed
-   t.m_MeBack = 0
-   t.m_MeNose = 10
-   t.m_MeReach = 25
-   t.m_EnemyBack = 500
-   t.m_EnemyNose = 490
-   t.m_EnemyReach = 475
-   t.m_Fluchtplatz = 10
-   t.m_magicBullet = false
-   t.m_magicBulletDistance = 200
-   t.m_Gegner_Speed = fast
-   t.m_Gegner_CanHitUs = true
-   t.m_Gegner_CanBeHitByUs = false
-   t.m_Gegner_DistanceNose2Nose = 200
-   t.m_ActivityEnemy = switcher
-   t.m_GegnerImpaired = false
+   -- init will be done in startRound()
   return t
 end
 
@@ -49,6 +26,35 @@ sleeper, blocker, spammer, jumper, switcher = 0,1,2,3,4
 KEnemyName_Vega = "Vega"
 KEnemyNme_Dhalsim = "Dhalsim"
 KEnemyName_Honda = "Honda"
+
+
+function playerInputs:startRound()
+    self.PenaltyTime = 0
+    self.bEnemyUsedMagic = false
+    self.SpamMeasurement = {}
+    for i = 1,300 do
+        self.SpamMeasurement[i] = false
+    end
+    self.SpamMeasurementIndex = 1;
+ 
+    self.m_bDebugOutAllowed = a_bDebugOutAllowed
+    self.m_MeBack = 0
+    self.m_MeNose = 10
+    self.m_MeReach = 25
+    self.m_EnemyBack = 500
+    self.m_EnemyNose = 490
+    self.m_EnemyReach = 475
+    self.m_Fluchtplatz = 10
+    self.m_magicBullet = false
+    self.m_magicBulletDistance = 200
+    self.m_Gegner_Speed = fast
+    self.m_Gegner_CanHitUs = true
+    self.m_Gegner_CanBeHitByUs = false
+    self.m_Gegner_DistanceNose2Nose = 200
+    self.m_ActivityEnemy = switcher
+    self.m_GegnerImpaired = false
+end
+
 
 function playerInputs:calcBoundingBoxes(me, enemy)
     --me

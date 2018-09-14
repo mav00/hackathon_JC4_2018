@@ -16,7 +16,7 @@ function Example.new(player)
    self.i = 0 
    self.m_playerAction = _playerAction.new(false)
    self.m_playerStrategy = _playerStrategie.new(self.m_playerAction,false)
-   self.m_playerInputs = _playerinputs.new(true) 
+   self.m_playerInputs = _playerinputs.new(false) 
    
 
    return self

@@ -4,6 +4,8 @@ local throwDuration = 30
 local throwDurationMid = 6
 local throwDurationShort = 3
 
+local minimumTriggerTime = 2
+
 playerAction.__index = playerAction -- failed table lookups on the instances should fallback to the class table, to get methods
 setmetatable(playerAction, {
   __call = function (cls, ...)
@@ -57,27 +59,47 @@ function playerAction:mediumIntPunchKey() return "Y" end
 function playerAction:highIntPunchKey() return "Z" end
 
 function playerAction:lowIntPunch()
- local result = {}
- result[self:lowIntPunchKey()] = true
- return result
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
+    result[self:lowIntPunchKey()] = true
+  else
+    self.i = 0
+    result = {}
+  end
+  return result
 end
 
 function playerAction:mediumIntPunch()
- local result = {}
- result[self:mediumIntPunchKey()] = true
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
+    result[self:mediumIntPunchKey()] = true
+  else
+    self.i = 0
+    result = {}
+  end
  return result
 end
 
 function playerAction:highIntPunch()
- local result = {}
- result[self:highIntPunchKey()] = true
- return result
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
+    result[self:highIntPunchKey()] = true
+  else
+    self.i = 0
+    result = {}
+  end
+  return result
 end
 
 
 -- punch and up/down move
 function playerAction:lowPunch(intensity)
-    local result = {}
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
     if intensity == "L" then 
       result[self:lowIntPunchKey()] = true
     end
@@ -88,7 +110,11 @@ function playerAction:lowPunch(intensity)
       result[self:highIntPunchKey()] = true
     end
     result["Down"] = true
-    return result
+  else
+    self.i = 0
+    result = {}
+  end
+  return result
 end
     
 function playerAction:airPunch(me)
@@ -96,11 +122,9 @@ function playerAction:airPunch(me)
    if self.i < 40 then  -- up
       result["Up"] = true
       result[self:forward(me)] = true
-   elseif self.i > 40 and self.i < 44
-   then -- MP
+   elseif self.i > 40 and self.i < 44 then -- MP
       result["Y"] = true
-   elseif self.i >50
-   then
+   elseif self.i > 50 then
       self.i = 0
       return result
    end
@@ -109,19 +133,22 @@ function playerAction:airPunch(me)
    return result
 end
 
-function playerAction:jumpPunch(me)
-   local result = {}
-   if self.i > 9 then
-     result[self:lowIntPunchKey()] = true
-   end
-   
-   if self.i < 30 then  -- up
-      result["Up"] = true
+function playerAction:jumpPunch(me, enemy)
+  local result = {}
+  local enCrouching = (enemy["crounching"] == true)
+  if not enCrouching and (self.i > 9) then
+    result[self:lowIntPunchKey()] = true
+  elseif enCrouching and (self.i > 32) then
+    result[self:highIntKickKey()] = true
+  end
+
+  if self.i < 20 then  -- up
+    result["Up"] = true
   end
   
-  if self.i > 30 and (me["y"] < 1) then
+  if self.i > 50 and (me["y"] < 2) then
       self.i = 0
-      return result
+      return {}
    end
 
    self.i = self.i + 1
@@ -234,13 +261,13 @@ end
 -- sky high claw
 function playerAction:skyHighClaw(me)
    local result = {}
-   if self.i < 150 then 
+   if self.i < 100 then 
       result["Down"] = true
-   elseif self.i > 150 and self.i < 170
+   elseif self.i > 100 and self.i < 120
    then -- up + punch
       result["Up"] = true
       result[self:highIntPunchKey()] = true
-   elseif self.i > 170
+   elseif self.i > 120
    then
       self.i = 0
       return result
@@ -258,26 +285,46 @@ function playerAction:mediumIntKickKey() return "B" end
 function playerAction:highIntKickKey() return "C" end
 
 function playerAction:lowIntKick()
- local result = {}
- result[self:lowIntKickKey()] = true
- return result
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
+    result[self:lowIntKickKey()] = true
+  else
+    self.i = 0
+    result = {}
+  end
+  return result
 end
 
 function playerAction:mediumIntKick() 
- local result = {}
- result[self:mediumIntKickKey()] = true
- return result
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
+    result[self:mediumIntKickKey()] = true
+  else
+    self.i = 0
+    result = {}
+  end
+  return result
 end
 
 function playerAction:highIntKick() 
- local result = {}
- result[self:highIntKickKey()] = true
- return result
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
+    result[self:highIntKickKey()] = true
+  else
+    self.i = 0
+    result = {}
+  end
+  return result
 end
 
 -- punch and up/down move
 function playerAction:lowKick(intensity)
-    local result = {}
+  local result = {}
+  if self.i < minimumTriggerTime then
+    self.i = self.i + 1
     if intensity == "L" then 
       result[self:lowIntKickKey()] = true
     end
@@ -288,7 +335,11 @@ function playerAction:lowKick(intensity)
       result[self:highIntKickKey()] = true
     end
     result["Down"] = true
-    return result
+  else
+    self.i = 0
+    result = {}
+  end
+  return result
 end
 
 function playerAction:airKick(me)
@@ -296,11 +347,9 @@ function playerAction:airKick(me)
    if self.i < 40 then  -- up
       result["Up"] = true
       result[self:forward(me)] = true
-   elseif self.i > 40 and self.i < 44
-   then -- MP
+   elseif self.i > 40 and self.i < 44 then -- MP
       result["C"] = true
-   elseif self.i >50
-   then
+   elseif self.i > 50 then
       self.i = 0
       return result
    end

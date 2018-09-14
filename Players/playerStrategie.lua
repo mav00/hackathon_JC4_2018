@@ -22,6 +22,7 @@ function playerStrategie.new(action, debugFlag)
    t.forwardSteps = 0
    t.lastDistToEnemy = 0
    t.firstBlood = false
+   t.approachSteps = 0
   return t
 end
 
@@ -35,6 +36,7 @@ function playerStrategie:startRound()
   self.forwardSteps = 0
   self.lastDistToEnemy = 0
   self.firstBlood = false
+  self.approachSteps = 0
 end
 
 
@@ -54,19 +56,24 @@ function playerStrategie:doStrategie(me, enemy, input)
   local enAttacking = (enemy["attacking"] == true)
   local meAttacking = (me["attacking"] == true)
   local enCrouching = (enemy["crounching"] == true)
+  local enBacking = (enemy["goingBack"] == true)
   local eitherApproach = (me["advancing"] or enemy["advancing"])
+  if eitherApproach then self.approachSteps = self.approachSteps + 1 else self.approachSteps = 0 end
   local magicBulletDanger = input.m_magicBullet
   local shouldApproach = input.m_Gegner_CanBeHitByUs
   local airTop = 25
-  local attackDistanceSlide = 113
+  local attackDistanceSlide = 110
   local attackDistancePHigh = 98
-  local attackDistancePMid = 92
+  local attackDistancePMid = 91
   local attackDistancePLow = 57
   local attackDistanceKHigh = 63
   local attackDistanceKMid = 74
   local attackDistanceKLow = 54
   local attackDistanceThrow = 25
   local blockDistance = 80
+  if enBacking then
+    attackDistancePMid = attackDistancePMid - 5
+  end
   local distToEnemy = input.m_Gegner_DistanceNose2Nose
   local deltaDistToEnemy = (distToEnemy - self.lastDistToEnemy)
   if enemy["blockOrHit"] then self.firstBlood = true end
@@ -145,9 +152,11 @@ function playerStrategie:doStrategie(me, enemy, input)
     elseif (distToEnemy < attackDistancePLow) then
       r = slide
     elseif (distToEnemy < attackDistancePMid) then
-        r = punchMid
-    elseif (distToEnemy < (attackDistancePMid + 10)) and (((not firstBlood and (self.forwardSteps > 2))) or eitherApproach) then
-        r = punchMid
+      r = punchMid
+    elseif (distToEnemy < (attackDistancePMid + 10)) and (((not firstBlood and (self.forwardSteps > 2))) or (self.approachSteps > 8)) then
+      r = punchMid
+    elseif (distToEnemy < attackDistancePHigh) then
+      r = punchHigh
     else
       r = goForward
     end

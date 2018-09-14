@@ -51,12 +51,12 @@ function Example:fighter()
 	-- return "ChunLi"
 	--return "Zangief"
 	-- return "Dhalsim"
-	-- return "Sagat"
-    return "Vega"
+	 --return "Sagat"
+     --return "Vega"
 	-- return "THawk"
 	-- return "Feilong"
 	-- return "DeeJay"
-	-- return "Cammy"
+	 return "Cammy"
 	-- return "MBison"
 end
 

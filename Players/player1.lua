@@ -13,37 +13,18 @@ function Example.new(player)
    local self = Player.new(player)
    setmetatable(self, Example_mt)
 
-   self.i = 0 
    self.m_playerAction = _playerAction.new(false)
-   self.m_playerStrategy = _playerStrategie.new(self.m_playerAction,false)
+   self.m_playerStrategy = _playerStrategie.new(self.m_playerAction,true)
    self.m_playerInputs = _playerinputs.new(false) 
-   
-
    return self
 end
 
-function Example:forward(me)
-	if me["facingRight"] then
-		return "Right"
-	end
-	return "Left"
-end
+function Example:startRound()
+	self.m_playerInputs.startRound()
+	self.m_playerAction.startRound()
+	self.m_playerAction.startRound()
 
-function Example:backward(me)
-	if me["facingRight"] then
-		return "Left"
-	end
-	return "Right"
 end
-
-function Example:distanceToMagic(me, enemy)
-	if me["facingRight"] then
-		return  me["x"] - enemy["remoteAttackPos"]
-	else
-		return enemy["remoteAttackPos"] - me["x"]
-	end
-end
-
 
 function Example:advance(me, enemy)
 
@@ -76,7 +57,7 @@ function Example:fighter()
 end
 
 function Example:name()
-	return "HaraldDucken"
+	return "HaraldNukem"
 end
 
 

@@ -20,6 +20,11 @@ function playerAction.new(init)
   return t
 end
 
+function playerAction:startRound()
+  self.i = 0
+end
+
+
 --[[
      MOVEMENT ACTIONS
 ]]--

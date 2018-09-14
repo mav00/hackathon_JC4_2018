@@ -13,22 +13,34 @@ function playerStrategie.new(action, debugFlag)
    -- Your constructor stuff
    t.action = action
    t.debug = debugFlag
-   t.isStrategyOffensive = true
    t.lastAction = oInit
    t.airTopReached = false
    t.eyold = 0
    t.actionDelay = 0
    t.dizzyThrows = 2
    t.dizzyWait = 0
+   t.forwardSteps = 0
   return t
 end
 
+function playerStrategie:startRound()
+  console.writeline("start")
+  self.lastAction = oInit
+  self.airTopReached = false
+  self.eyold = 0
+  self.actionDelay = 0
+  self.dizzyThrows = 2
+  self.dizzyWait = 0
+  self.forwardSteps = 0
+end
 
-oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dPunchMid, dPunchHigh, dCrouchKickHigh, dAirKickHigh,
-punchLow, punchMid, punchHigh, airKickHigh, crouchPunchHigh, vertPunchLow, rainbowMid, skyHighClaw,
+
+
+oInit, dCrouchBlock, dBlock, dKickLow, dPunchLow, dPunchMid, dPunchHigh, dSlide, dAirKickHigh,
+punchLow, punchMid, punchHigh, airKickHigh, crouchPunchHigh, vertPunchLow, rainbowMid, skyHighClaw, slide,
 goBackward, goForward =
-"o init", "d crouch block", "d block", "d kick low", "d punch low", "d punch mid", "d punch high", "d crouch kick high", "d air kick high",
-"punch low", "punch mid", "punch high", "air kick high", "crouch punch high", "vert punch low", "rainbow mid", "skyHighClaw",
+"o init", "d crouch block", "d block", "d kick low", "d punch low", "d punch mid", "d punch high", "d slide", "d air kick high",
+"punch low", "punch mid", "punch high", "air kick high", "crouch punch high", "vert punch low", "rainbow mid", "skyHighClaw", "slide",
 "go backward", "go forward"
 -------------------------------------------------------
 function playerStrategie:doStrategie(me, enemy, input)
@@ -44,7 +56,7 @@ function playerStrategie:doStrategie(me, enemy, input)
   local airTop = 25
   local attackDistanceSlide = 118
   local attackDistancePHigh = 98
-  local attackDistancePMid = 88
+  local attackDistancePMid = 92
   local attackDistancePLow = 57
   local attackDistanceKHigh = 63
   local attackDistanceKMid = 74
@@ -111,7 +123,7 @@ function playerStrategie:doStrategie(me, enemy, input)
     elseif input.m_Gegner_CanHitUs then
       r = dCrouchBlock
     elseif (distToEnemy < attackDistanceSlide) then
-      r = dCrouchKickHigh -- slide
+      r = dSlide
     else
       -- chill
     end
@@ -120,15 +132,15 @@ function playerStrategie:doStrategie(me, enemy, input)
       if (distToEnemy < attackDistancePLow) then
         r = vertPunchLow
       else
-        r = airKickHigh
+        r = slide --airKickHigh
       end
     elseif (distToEnemy < attackDistanceThrow) then
       r = rainbowMid
     elseif (distToEnemy < attackDistancePLow) then
-      r = dCrouchKickHigh -- slide
+      r = slide
     elseif (distToEnemy < attackDistancePMid) then
         r = punchMid
-    elseif (distToEnemy < (attackDistancePMid + 30)) and (self.lastAction == goForward) then
+    elseif (distToEnemy < (attackDistancePMid + 30)) and (self.forwardSteps > 2) then
         r = punchMid
     else
       r = goForward
@@ -147,6 +159,7 @@ end
 
 function playerStrategie:getActionResult(a)
   r = {}
+  local forward = false
   if dCrouchBlock == a then
     r = self.action:goBackward(self.me)
     r["Down"] = true
@@ -184,7 +197,15 @@ function playerStrategie:getActionResult(a)
     r = self.action:goBackward(self.me)
   elseif goForward == a then
     r = self.action:goForward(self.me)
+    forward = true
   end
+  
+  if forward then
+    self.forwardSteps = self.forwardSteps + 1
+  else
+    self.forwardSteps = 0
+  end
+  
   return r
 end
 
@@ -201,7 +222,7 @@ function playerStrategie:actionDefendMagic()
 end
 
 function playerStrategie:drawText(text)
-  if self.debug then
+  if (self.debug and (text ~= nil)) then
     local face = "L"
     if self.me["facingRight"] then
       face = "R"
